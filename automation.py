@@ -3,17 +3,32 @@ from pywinauto.application import Application
 from pywinauto.keyboard import send_keys
 
 
-def selectFirstObjectInList(EzCadAppRef):
+
+"""
+INPUTS: 
+    Path of SVG File,
+    Number of Objects in SVG File,
+    Time taken by Mark(F2) function (not 100% sure)
+
+FUTURE WORK:
+    Remove the error functions,
+    Take input for numberOfObjectsInSVG or calcuate it within the app,
+    Calculate time required for Mark(F2) process to terminate,
+
+    Create .exe file with appropriate inputs
+"""
+
+
+
+def selectFirstObjectInList(EzCadAppRef, loopCount):
     # Selects the first item to be printed from the available objects in the object list
 
-    # Select the "Edit Node" Tool
-    toolbarwindow = EzCadAppRef[u'Toolbar3']
-    edit_node = toolbarwindow.button(1)
-    edit_node.click()
+    if(loopCount == 0):     # This reduces the PC Load by only having to click outside the Object List box ONCE
+        # Select the "Edit Node" Tool
+        EzCadAppRef[u'Toolbar3'].button(1).click()
 
-    # Reselect the "Pick" Tool
-    pick = toolbarwindow.button(0)
-    pick.click()
+        # Reselect the "Pick" Tool
+        EzCadAppRef[u'Toolbar3'].button(0).click()
 
     # Click the title of "Object List"
     objectHeader = EzCadAppRef[u'Header']
@@ -36,6 +51,18 @@ def hatchObject(app, EzCadAppRef):
     app.Hatch[u'&OK'].click_input()
 
 
+def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
+    # Enable OR Disable the hatching checkbox in the "Hatching" Table and click "Apply"
+
+    if(setCheckmarkTo == 0):   # '0' signifies that the checkbox has to be unchecked
+        EzCadAppRef[u'Enable'].uncheck()
+        EzCadAppRef[u'&Apply'].click_input()
+
+    elif(setCheckmarkTo == 1): # '1' signifies that the checkbox has to be checkmarked
+        EzCadAppRef[u'Enable'].check()
+        EzCadAppRef[u'&Apply'].click_input()
+
+
 def selectMarkingProperty(EzCadAppRef, iter):
     # Selects either 'black' or 'blue' marking property based on the 'iter' value
 
@@ -50,20 +77,15 @@ def startMarking(EzCadAppRef):
     # Start the Marking process
 
     EzCadAppRef[u'Mark(F2)'].click_input()
+    time.sleep(2)   # Sleep till the printing is completed
 
 
-def clickEnableInHatching(EzCadAppRef):
-    # Enable OR Disable the hatching checkbox in the "Hatching" Table and click "Apply"
 
-    EzCadAppRef[u'Enable'].click_input()
-    EzCadAppRef[u'&Apply'].click_input()
-
-
-def print3dItem(app, EzCadAppRef):
+def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG):
     # Performs all relevant steps for all the available objects
 
-    for i in range(10):
-        selectFirstObjectInList(EzCadAppRef)
+    for i in range(0, numberOfObjectsInSVG):
+        selectFirstObjectInList(EzCadAppRef, i)
 
         time.sleep(0.5)
         setXtoZero(EzCadAppRef)
@@ -72,24 +94,22 @@ def print3dItem(app, EzCadAppRef):
         hatchObject(app, EzCadAppRef)
 
         time.sleep(0.5)
+        clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
+
+        time.sleep(0.5)
         selectMarkingProperty(EzCadAppRef, 0)
 
         time.sleep(0.5)
         startMarking(EzCadAppRef)
-        time.sleep(2)   # Sleep till the printing is completed
 
         time.sleep(0.5)
-        clickEnableInHatching(EzCadAppRef)
+        clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
 
         time.sleep(0.5)
         selectMarkingProperty(EzCadAppRef, 1)
 
         time.sleep(0.5)
         startMarking(EzCadAppRef)
-        time.sleep(2)
-
-        time.sleep(0.5)
-        clickEnableInHatching(EzCadAppRef)
 
         time.sleep(0.5)
         send_keys('{DELETE}')
@@ -111,25 +131,16 @@ errorWindow = app.EzCad.Ok.click()
 EzCadAppRef.wait('ready')
 
 
-time.sleep(1)
+# time.sleep(1)
 # Open the window to import file
 EzCadAppRef.menu_item(u'&File->Import Vector File...\\tCtrl+B').click()
-
-
-# app -> has "Open" window -> has "Edit" tab -> and then we click it
-### window = app.Open
-
-
-# Click on "File Name" input Box
-### edit = window.Edit
-### edit.click()
 
 
 # Type the URL of file in input-box
 app.Open.Edit.type_keys("C:\\Users\\maury\\Desktop\\For OptiLOM\\testingInputForEZCAD\\Untitled.svg", with_spaces = True)
 
 
-time.sleep(1)
+# time.sleep(1)
 # Click 'OK' button in "Open" window
 app.Open[u'&Open'].click_input()
 
@@ -150,4 +161,5 @@ EzCadAppRef[u'&Apply'].click()
 EzCadAppRef.menu_item(u'&Edit->UnGroup\\tCtrl+U').click()
 
 
-print3dItem(app, EzCadAppRef)
+numberOfObjectsInSVG = 10   # Either Calculate the total number of Objects or take the input from the user
+print3dItem(app, EzCadAppRef, numberOfObjectsInSVG)
