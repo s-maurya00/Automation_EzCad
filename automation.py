@@ -129,6 +129,23 @@ def selectMarkingProperty(EzCadAppRef, iter):
     elif(iter == 1):
         EzCadAppRef[u'Button13'].click_input()
 
+    # Uncheck default param
+    if(EzCadAppRef[u'Use default param'].get_check_state()):
+        EzCadAppRef[u'Use default param'].click()
+
+    # Set Speed(MM/Second)
+    EzCadAppRef[u'Spin1'].click()
+    speed = 10
+    send_keys(f"{speed}")
+
+    # Set Power%
+    EzCadAppRef[u'Spin2'].click()
+    power = 10
+    send_keys(f"{power}")
+
+    # Click Apply button
+    EzCadAppRef[u'&Apply2'].click()
+
 
 # INCOMPLETE
 def startMarking(EzCadAppRef):
@@ -139,7 +156,7 @@ def startMarking(EzCadAppRef):
 
 
 
-def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG):
+def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval):
     # Performs all relevant steps for all the available objects
 
     # global should_pause
@@ -178,10 +195,15 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG):
         time.sleep(0.5)
         send_keys('{DELETE}')
 
+        # Constant time that this function will pause between printing of each layer
+        time.sleep(const_printing_interval)
 
 
-def begin():
-    # time.sleep(150)
+
+
+
+def begin(const_printing_interval):
+
     app = Application().start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
     EzCadAppRef = app[u'EzCad2.14.11 - No title']
 
@@ -196,7 +218,6 @@ def begin():
     EzCadAppRef.wait('ready')
 
 
-    # time.sleep(1)
     # Open the window to import file
     EzCadAppRef.menu_item(u'&File->Import Vector File...\\tCtrl+B').click()
 
@@ -248,7 +269,7 @@ def begin():
     thread.start()
     """
     time.sleep(1)
-    print3dItem(app, EzCadAppRef, numberOfObjectsInSVG)
+    print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
 
 
 
@@ -259,38 +280,37 @@ class GUI:
         self.root.maxsize(620, 220)
         self.root.title("EzCad Automator")
 
-        # Sets the window to always on top 
-        # self.root.attributes("-topmost", True)
 
         self.select_file_section = tkinter.LabelFrame(self.root, text="Import File")
 
+
         # window variables
         self.file_location = tkinter.StringVar()
-        # self.file_location.set()
         self.no_of_layers = tkinter.IntVar()
         self.no_of_layers.set(0)
         self.layer_count_message = tkinter.StringVar()
+        self.const_printing_interval = tkinter.IntVar()
+        self.const_printing_interval.set(0)
 
+
+        # Define and positining of window elements
         self.file_entry = tkinter.Entry(self.select_file_section, textvariable=self.file_location, width=50, relief="groove")
         self.file_entry.grid(row=0, column=0, padx=10, pady=10)
 
         self.browse_button = tkinter.Button(self.select_file_section, text="Browse...", command=self.browse_file, width=15, relief="groove")
         self.browse_button.grid(row=0, column=1, padx=20, pady=10)
-        
-        # self.no_of_layers_entry = tkinter.Label(self.select_file_section, text="Select a file to show its layer count", width=40)
-        # self.no_of_layers_entry.config(textvariable=self.layer_count_message)
-        # self.no_of_layers_entry.grid(row=1, padx=20, pady=10)
+
+
+        # Take input for setting constant interval between printing of each layer
+        self.const_printing_interval_entry = tkinter.Entry(self.select_file_section, textvariable=self.const_printing_interval, width=50, relief="groove")
+        self.const_printing_interval_entry.grid(row=1, column=0, padx=10, pady=10)
 
         self.start_button = tkinter.Button(self.select_file_section, text="Start", command=self.start_process, width=15, relief="groove")
-        self.start_button.grid(row=1, column=0, pady=10)
+        self.start_button.grid(row=2, column=0, pady=10)
 
-        # self.start_pause = tkinter.Button(self.select_file_section, text="Pause", command=self.pause_process, width=15, relief="groove")
-        # self.start_pause.grid(row=1, column=1, pady=10)
-
-        # self.start_resume = tkinter.Button(self.select_file_section, text="Resume", command=self.resume_process, width=15, relief="groove")
-        # self.start_resume.grid(row=1, column=2, pady=10, padx=10)
 
         self.select_file_section.grid(padx=10, pady=10)
+
 
 
     def browse_file(self):
@@ -299,7 +319,7 @@ class GUI:
 
         if(file_path):
             self.file_location.set(file_path)
-            self.calc_no_of_layers()
+
 
 
     def calc_no_of_layers(self):
@@ -316,11 +336,13 @@ class GUI:
         print(f'There are {num_layers} layers in this SVG file.')
 
 
+
     def start_process(self):
 
         if(self.file_location.get()):   # If file location is selected, only then should the program start
             gui_root.destroy()
-            begin()
+            self.calc_no_of_layers()
+            begin(self.const_printing_interval.get())
 
 
 gui_root = tkinter.Tk()
