@@ -1,6 +1,13 @@
-import time
+import time, tkinter
+import xml.dom.minidom
+import threading
+
+# import automationGUI_control
+# from automationGUI_control import should_pause
+
 from pywinauto.application import Application
 from pywinauto.keyboard import send_keys
+from tkinter import filedialog
 
 
 
@@ -9,6 +16,7 @@ INPUTS:
     Path of SVG File,
     Number of Objects in SVG File,
     Time taken by Mark(F2) function (not 100% sure)
+    Add PAUSE and RESUME features which are mandatory
 
 FUTURE WORK:
     Remove the error functions,
@@ -17,6 +25,56 @@ FUTURE WORK:
 
     Create .exe file with appropriate inputs
 """
+
+
+"""
+# This is the section responsible for the pause and play buttons functioning
+should_pause = False
+
+class GUI_controls():
+
+    def __init__(self, root):
+        self.root = root
+        self.root.minsize(350, 200)
+        self.root.maxsize(350, 200)
+        self.root.title("EzCad Automator controls")
+
+        self.control_section = tkinter.LabelFrame(self.root, text="Controls")
+
+        # Sets the window to always on top
+        self.root.attributes("-topmost", True)
+
+
+        # window variables
+        # current_loop_count = 
+
+        self.start_pause = tkinter.Button(self.control_section, text="Pause", command=self.pause_process, width=16, relief="groove")
+        self.start_pause.grid(row=1, column=1, padx=10, pady=10)
+
+        self.start_resume = tkinter.Button(self.control_section, text="Resume", command=self.resume_process, width=16, relief="groove")
+        self.start_resume.grid(row=1, column=2, padx=10, pady=10)
+
+        self.control_section.grid(row=0, padx=10, pady=10)
+
+        self.layer_info_frame = tkinter.LabelFrame(self.root, text="Layer Information")
+
+        self.layer_info = tkinter.Label(self.layer_info_frame, text=f"Printing layer: 12 of 275")
+        self.layer_info.grid(row=2, padx=50, pady=10)
+
+        self.layer_info_frame.grid(row=3, padx=10, pady=10)
+
+    
+    def pause_process(self):
+        global should_pause
+        should_pause = True
+
+    def resume_process(self):
+        global should_pause
+        should_pause = False
+"""
+
+
+
 
 
 
@@ -84,7 +142,13 @@ def startMarking(EzCadAppRef):
 def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG):
     # Performs all relevant steps for all the available objects
 
+    # global should_pause
+
     for i in range(0, numberOfObjectsInSVG):
+
+        # while(should_pause):
+        #     time.sleep(0.1)
+
         selectFirstObjectInList(EzCadAppRef, i)
 
         time.sleep(0.5)
@@ -116,50 +180,149 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG):
 
 
 
+def begin():
+    # time.sleep(150)
+    app = Application().start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
+    EzCadAppRef = app[u'EzCad2.14.11 - No title']
 
 
-app = Application().start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
-EzCadAppRef = app[u'EzCad2.14.11 - No title']
+    # Handling Errors
+    app.License.IAgree.click()
+    app.EzCad.Ok.click()
+    app.EzCad.Ok.click()
 
 
-# Handling Errors
-errorWindow = app.EzCad.Ok.click()
-errorWindow = app.EzCad.Ok.click()
+    # Pause code's execuition untill the application gets loaded
+    EzCadAppRef.wait('ready')
 
 
-# Pause code's execuition untill the application gets loaded
-EzCadAppRef.wait('ready')
+    # time.sleep(1)
+    # Open the window to import file
+    EzCadAppRef.menu_item(u'&File->Import Vector File...\\tCtrl+B').click()
 
 
-# time.sleep(1)
-# Open the window to import file
-EzCadAppRef.menu_item(u'&File->Import Vector File...\\tCtrl+B').click()
+    # Type the file_location in input-box
+    location = gui.file_location.get().replace("/", "\\")
+    app.Open.Edit.type_keys(str(location), with_spaces = True)
 
 
-# Type the URL of file in input-box
-app.Open.Edit.type_keys("C:\\Users\\maury\\Desktop\\For OptiLOM\\testingInputForEZCAD\\Untitled.svg", with_spaces = True)
+    # Click 'OK' button in "Open" window
+    time.sleep(0.5)
+    app.Open[u'&Open'].click_input()
 
 
-# time.sleep(1)
-# Click 'OK' button in "Open" window
-app.Open[u'&Open'].click_input()
+    # Click and then Set the checkbox position to 2nd row, 1st Column
+    EzCadAppRef.Button3.click()
+    app.Dialog[u'CheckBox8'].click()
+    app.Dialog.Ok.click()
 
 
-# Click and then Set the checkbox position to 2nd row, 1st Column
-EzCadAppRef.Button3.click()
-app.Dialog[u'CheckBox8'].click()
-app.Dialog.Ok.click()
+    # Set 'X axis position', 'Y axis position' to Zero and then click 'Apply' button
+    EzCadAppRef.Edit2.type_keys('{END}+{HOME}0')
+    EzCadAppRef.Edit3.type_keys('{END}+{HOME}0')
+    EzCadAppRef[u'&Apply'].click()
 
 
-# Set 'X axis position', 'Y axis position' to Zero and then click 'Apply' button
-EzCadAppRef.Edit2.type_keys('{END}+{HOME}0')
-EzCadAppRef.Edit3.type_keys('{END}+{HOME}0')
-EzCadAppRef[u'&Apply'].click()
+    # Ungroup elements
+    EzCadAppRef.menu_item(u'&Edit->UnGroup\\tCtrl+U').click()
 
 
-# Ungroup elements
-EzCadAppRef.menu_item(u'&Edit->UnGroup\\tCtrl+U').click()
+    # Either Calculate the total number of Objects or take the input from the user
+    numberOfObjectsInSVG = gui.no_of_layers.get()
 
 
-numberOfObjectsInSVG = 10   # Either Calculate the total number of Objects or take the input from the user
-print3dItem(app, EzCadAppRef, numberOfObjectsInSVG)
+
+    """
+    # Create the GUI window of controls on screen
+    gui_controls_root = tkinter.Tk()
+    gui_controls = GUI_controls(gui_controls_root)
+
+    # gui_controls_root.after(1, print3dItem, app, EzCadAppRef, numberOfObjectsInSVG)  # This lets the print3dItem function to execuite even after the new gui is created
+
+    gui_controls_root.mainloop()
+
+    def print3d_thread():
+        print3dItem(app, EzCadAppRef, numberOfObjectsInSVG)
+
+    thread = threading.Thread(target=print3d_thread)
+    thread.start()
+    """
+    time.sleep(1)
+    print3dItem(app, EzCadAppRef, numberOfObjectsInSVG)
+
+
+
+class GUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.minsize(620, 220)
+        self.root.maxsize(620, 220)
+        self.root.title("EzCad Automator")
+
+        # Sets the window to always on top 
+        # self.root.attributes("-topmost", True)
+
+        self.select_file_section = tkinter.LabelFrame(self.root, text="Import File")
+
+        # window variables
+        self.file_location = tkinter.StringVar()
+        # self.file_location.set()
+        self.no_of_layers = tkinter.IntVar()
+        self.no_of_layers.set(0)
+        self.layer_count_message = tkinter.StringVar()
+
+        self.file_entry = tkinter.Entry(self.select_file_section, textvariable=self.file_location, width=50, relief="groove")
+        self.file_entry.grid(row=0, column=0, padx=10, pady=10)
+
+        self.browse_button = tkinter.Button(self.select_file_section, text="Browse...", command=self.browse_file, width=15, relief="groove")
+        self.browse_button.grid(row=0, column=1, padx=20, pady=10)
+        
+        # self.no_of_layers_entry = tkinter.Label(self.select_file_section, text="Select a file to show its layer count", width=40)
+        # self.no_of_layers_entry.config(textvariable=self.layer_count_message)
+        # self.no_of_layers_entry.grid(row=1, padx=20, pady=10)
+
+        self.start_button = tkinter.Button(self.select_file_section, text="Start", command=self.start_process, width=15, relief="groove")
+        self.start_button.grid(row=1, column=0, pady=10)
+
+        # self.start_pause = tkinter.Button(self.select_file_section, text="Pause", command=self.pause_process, width=15, relief="groove")
+        # self.start_pause.grid(row=1, column=1, pady=10)
+
+        # self.start_resume = tkinter.Button(self.select_file_section, text="Resume", command=self.resume_process, width=15, relief="groove")
+        # self.start_resume.grid(row=1, column=2, pady=10, padx=10)
+
+        self.select_file_section.grid(padx=10, pady=10)
+
+
+    def browse_file(self):
+
+        file_path = filedialog.askopenfilename(title="Select a File", filetypes=(("All Vector files", "*.ai *.plt *.dxf *.dst *.svg *.nc *.g *.gbr"), ("all files", "*.*")))
+
+        if(file_path):
+            self.file_location.set(file_path)
+            self.calc_no_of_layers()
+
+
+    def calc_no_of_layers(self):
+
+        # parse the SVG file
+        doc = xml.dom.minidom.parse(self.file_location.get())
+
+        # count the number of 'g' elements (layers)
+        layers = doc.getElementsByTagName('g')
+        num_layers = len(layers)
+
+        self.no_of_layers.set(num_layers)
+
+        print(f'There are {num_layers} layers in this SVG file.')
+
+
+    def start_process(self):
+
+        if(self.file_location.get()):   # If file location is selected, only then should the program start
+            gui_root.destroy()
+            begin()
+
+
+gui_root = tkinter.Tk()
+gui = GUI(gui_root)
+gui_root.mainloop()
