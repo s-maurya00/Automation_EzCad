@@ -1,9 +1,7 @@
 import time, tkinter
 import xml.dom.minidom
-import threading
-
-# import automationGUI_control
-# from automationGUI_control import should_pause
+import win32gui
+import pyautogui
 
 from pywinauto.application import Application
 from pywinauto.keyboard import send_keys
@@ -106,7 +104,15 @@ def hatchObject(app, EzCadAppRef):
     # Hatches the current object and press 'OK'
 
     EzCadAppRef.menu_item(u'&Edit->Hatch\\tCtrl+H').click()
-    app.Hatch[u'&OK'].click_input()
+
+    time.sleep(1)
+    while True:
+        if app.Hatch.exists():
+            time.sleep(1)
+        else:
+            break
+
+    # app.Hatch[u'&OK'].click_input()
 
 
 def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
@@ -152,7 +158,7 @@ def startMarking(EzCadAppRef):
     # Start the Marking process
 
     EzCadAppRef[u'Mark(F2)'].click_input()
-    time.sleep(2)   # Sleep till the printing is completed
+    time.sleep(15)   # Sleep till the printing is completed
 
 
 
@@ -201,8 +207,62 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
 
 
 
+def moveAppToRightSide():
+    
+    successStatus = False
+    pyautogui.FAILSAFE = False
+    
+    # Find the Notepad window
+    hwnd = win32gui.FindWindow(None, "EzCad2.14.11 - No title")
+    if hwnd:
+        # Get the position of the title bar
+        rect = win32gui.GetWindowRect(hwnd)
+        x = rect[0] + rect[2] / 2
+        y = rect[1] + 30
+        # Move the cursor to the title bar and double-click
+        pyautogui.moveTo(x, y, duration=0.5)
+        # pyautogui.doubleClick()
+        # Move the cursor to the top-right corner of the screen
+        screen_width, screen_height = pyautogui.size()
+        # pyautogui.moveTo(screen_width, 0, duration=0.5)
+        pyautogui.dragTo(screen_width, screen_height/2, duration=0.5)
+        # Release the click
+        pyautogui.mouseUp()
+        successStatus = True
 
-def begin(const_printing_interval):
+    else:
+        print("EzCad2.14.11 not found")
+
+    return successStatus
+
+
+
+
+def waitForResizing(resize_wait_time):
+
+    def update_label():
+        nonlocal resize_wait_time
+        resize_wait_time -= 1
+        label.config(text=f"Remaining Wait Time: {resize_wait_time} seconds")
+        if resize_wait_time == 0:
+            wait_window.destroy()
+            time.sleep(1)
+            return
+        label.after(1000, update_label)
+
+    wait_window = tkinter.Tk()
+    wait_window.geometry("500x200")
+
+    label = tkinter.Label(wait_window, text=f"Remaining Wait Time: {resize_wait_time} seconds")
+    label.pack()
+
+    label.after(1000, update_label)
+    wait_window.mainloop()
+
+
+
+
+def begin(resizingWaitTime, const_printing_interval):
 
     app = Application().start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
     EzCadAppRef = app[u'EzCad2.14.11 - No title']
@@ -216,6 +276,16 @@ def begin(const_printing_interval):
 
     # Pause code's execuition untill the application gets loaded
     EzCadAppRef.wait('ready')
+
+
+    # Double click titleBar of the window and drag it to right-corner to snap to the same
+    time.sleep(0.5)
+    moveAppToRightSide()
+    time.sleep(0.5)
+
+
+    # Wait for user to resize other windows
+    waitForResizing(resizingWaitTime)
 
 
     # Open the window to import file
@@ -276,8 +346,8 @@ def begin(const_printing_interval):
 class GUI:
     def __init__(self, root):
         self.root = root
-        self.root.minsize(620, 220)
-        self.root.maxsize(620, 220)
+        self.root.minsize(620, 250)
+        self.root.maxsize(620, 250)
         self.root.title("EzCad Automator")
 
 
@@ -291,9 +361,11 @@ class GUI:
         self.layer_count_message = tkinter.StringVar()
         self.const_printing_interval = tkinter.IntVar()
         self.const_printing_interval.set(0)
+        self.resizing_wait_time = tkinter.IntVar()
+        self.resizing_wait_time.set(45)
 
 
-        # Define and positining of window elements
+        # Browse and input file url to be imported in Ezcad
         self.file_entry = tkinter.Entry(self.select_file_section, textvariable=self.file_location, width=50, relief="groove")
         self.file_entry.grid(row=0, column=0, padx=10, pady=10)
 
@@ -302,11 +374,22 @@ class GUI:
 
 
         # Take input for setting constant interval between printing of each layer
-        self.const_printing_interval_entry = tkinter.Entry(self.select_file_section, textvariable=self.const_printing_interval, width=50, relief="groove")
-        self.const_printing_interval_entry.grid(row=1, column=0, padx=10, pady=10)
+        self.const_printing_interval_label = tkinter.Label(self.select_file_section, text="Enter constant printing wait time (default is 0 sec)")
+        self.const_printing_interval_label.grid(row=1, column=0, padx=10, pady=10)
+
+        self.const_printing_interval_entry = tkinter.Entry(self.select_file_section, textvariable=self.const_printing_interval, width=15, relief="groove")
+        self.const_printing_interval_entry.grid(row=1, column=1, padx=10, pady=10)
+
+
+        # Take input for time to wait for user to resize their windows as they see fit
+        self.resizing_wait_time_label = tkinter.Label(self.select_file_section, text="Enter resizing wait time (default is 45 sec)")
+        self.resizing_wait_time_label.grid(row=2, column=0, padx=10, pady=10)
+
+        self.resizing_wait_time_entry = tkinter.Entry(self.select_file_section, textvariable=self.resizing_wait_time, width=15, relief="groove")
+        self.resizing_wait_time_entry.grid(row=2, column=1, padx=10, pady=10)
 
         self.start_button = tkinter.Button(self.select_file_section, text="Start", command=self.start_process, width=15, relief="groove")
-        self.start_button.grid(row=2, column=0, pady=10)
+        self.start_button.grid(row=3, column=0, pady=10)
 
 
         self.select_file_section.grid(padx=10, pady=10)
@@ -342,7 +425,7 @@ class GUI:
         if(self.file_location.get()):   # If file location is selected, only then should the program start
             gui_root.destroy()
             self.calc_no_of_layers()
-            begin(self.const_printing_interval.get())
+            begin(self.resizing_wait_time.get(), self.const_printing_interval.get())
 
 
 gui_root = tkinter.Tk()
