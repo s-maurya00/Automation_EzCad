@@ -100,19 +100,20 @@ def setXtoZero(EzCadAppRef):
     EzCadAppRef[u'&Apply'].click_input()
 
 
-def hatchObject(app, EzCadAppRef):
+def hatchObject(app, EzCadAppRef, loopCount):
     # Hatches the current object and press 'OK'
 
     EzCadAppRef.menu_item(u'&Edit->Hatch\\tCtrl+H').click()
 
-    time.sleep(1)
-    while True:
-        if app.Hatch.exists():
-            time.sleep(1)
-        else:
-            break
-
-    # app.Hatch[u'&OK'].click_input()
+    time.sleep(0.5)
+    if(loopCount == 0):
+        while True:
+            if app.Hatch.exists():
+                time.sleep(1)
+            else:
+                break
+    else:
+        app.Hatch[u'&OK'].click_input()
 
 
 def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
@@ -178,7 +179,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
         setXtoZero(EzCadAppRef)
 
         time.sleep(0.5)
-        hatchObject(app, EzCadAppRef)
+        hatchObject(app, EzCadAppRef, i)
 
         time.sleep(0.5)
         clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
