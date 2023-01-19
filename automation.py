@@ -5,7 +5,7 @@ import pyautogui
 
 from pywinauto.application import Application
 from pywinauto.keyboard import send_keys
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 
 
@@ -15,6 +15,9 @@ INPUTS:
     Number of Objects in SVG File,
     Time taken by Mark(F2) function (not 100% sure)
     Add PAUSE and RESUME features which are mandatory
+
+    19-01-2023
+    Take Marking delay input from the user in seconds 
 
 FUTURE WORK:
     Remove the error functions,
@@ -106,9 +109,9 @@ def hatchObject(app, EzCadAppRef, loopCount):
     EzCadAppRef.menu_item(u'&Edit->Hatch\\tCtrl+H').click()
 
     time.sleep(0.5)
-    if(loopCount == 0):
+    if(loopCount == 0): # Only wait for user input in setting the hatching property for the 1st loop item.
         while True:
-            if app.Hatch.exists():
+            if app.Hatch.exists():  # If the Hatching property window is open, wait 1 second and recheck if it's open, if yes then wait again else return from the function
                 time.sleep(1)
             else:
                 break
@@ -128,30 +131,73 @@ def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
         EzCadAppRef[u'&Apply'].click_input()
 
 
-def selectMarkingProperty(EzCadAppRef, iter):
+def selectMarkingProperty(EzCadAppRef, iter, loopCount):
     # Selects either 'black' or 'blue' marking property based on the 'iter' value
 
-    if(iter == 0):
+    if(iter == 0):  # Black color parameters
+        
+        # Click Black Color button
         EzCadAppRef[u'Button12'].click_input()
+
+        if(loopCount == 0):
+
+            # Uncheck default param
+            if(EzCadAppRef[u'Use default param'].get_check_state()):
+                EzCadAppRef[u'Use default param'].click()
+
+            # Set Speed(MM/Second) for black parameter
+            EzCadAppRef[u'Spin1'].click()
+            speed = 750
+            send_keys(f"{speed}")
+
+            # Set Power% for black parameter
+            EzCadAppRef[u'Spin2'].click()
+            power = 50
+            send_keys(f"{power}")
+
+            # Click Apply button
+            EzCadAppRef[u'&Apply2'].click()
+
     elif(iter == 1):
+
+        # Click Blue color Button
         EzCadAppRef[u'Button13'].click_input()
 
-    # Uncheck default param
-    if(EzCadAppRef[u'Use default param'].get_check_state()):
-        EzCadAppRef[u'Use default param'].click()
+        if(loopCount == 0):
 
-    # Set Speed(MM/Second)
-    EzCadAppRef[u'Spin1'].click()
-    speed = 10
-    send_keys(f"{speed}")
+            # Uncheck default param
+            if(EzCadAppRef[u'Use default param'].get_check_state()):
+                EzCadAppRef[u'Use default param'].click()
 
-    # Set Power%
-    EzCadAppRef[u'Spin2'].click()
-    power = 10
-    send_keys(f"{power}")
+            # Set Speed(MM/Second) for blue parameter
+            EzCadAppRef[u'Spin1'].click()
+            speed = 180
+            send_keys(f"{speed}")
 
-    # Click Apply button
-    EzCadAppRef[u'&Apply2'].click()
+            # Set Power% for blue parameter
+            EzCadAppRef[u'Spin2'].click()
+            power = 70
+            send_keys(f"{power}")
+
+            # Click Apply button
+            EzCadAppRef[u'&Apply2'].click()
+
+    # # Uncheck default param
+    # if(EzCadAppRef[u'Use default param'].get_check_state()):
+    #     EzCadAppRef[u'Use default param'].click()
+
+    # # Set Speed(MM/Second)
+    # EzCadAppRef[u'Spin1'].click()
+    # speed = 10
+    # send_keys(f"{speed}")
+
+    # # Set Power%
+    # EzCadAppRef[u'Spin2'].click()
+    # power = 10
+    # send_keys(f"{power}")
+
+    # # Click Apply button
+    # EzCadAppRef[u'&Apply2'].click()
 
 
 # INCOMPLETE
@@ -170,6 +216,8 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
 
     for i in range(0, numberOfObjectsInSVG):
 
+        print("\nWorking on Layer: ", i+1)
+
         # while(should_pause):
         #     time.sleep(0.1)
 
@@ -185,7 +233,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
         clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
 
         time.sleep(0.5)
-        selectMarkingProperty(EzCadAppRef, 0)
+        selectMarkingProperty(EzCadAppRef, 0, i)
 
         time.sleep(0.5)
         startMarking(EzCadAppRef)
@@ -194,7 +242,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
         clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
 
         time.sleep(0.5)
-        selectMarkingProperty(EzCadAppRef, 1)
+        selectMarkingProperty(EzCadAppRef, 1, i)
 
         time.sleep(0.5)
         startMarking(EzCadAppRef)
@@ -232,6 +280,13 @@ def moveAppToRightSide():
         successStatus = True
 
     else:
+        time.sleep(2)
+        error_box = tkinter.Tk()
+        error_box.title("Error")
+
+        messagebox.showerror("Error", "Could not find open EzCad software window.")
+
+        error_box.mainloop()
         print("EzCad2.14.11 not found")
 
     return successStatus
@@ -244,7 +299,9 @@ def waitForResizing(resize_wait_time):
     def update_label():
         nonlocal resize_wait_time
         resize_wait_time -= 1
+
         label.config(text=f"Remaining Wait Time: {resize_wait_time} seconds")
+
         if resize_wait_time == 0:
             wait_window.destroy()
             time.sleep(1)
@@ -252,12 +309,22 @@ def waitForResizing(resize_wait_time):
         label.after(1000, update_label)
 
     wait_window = tkinter.Tk()
-    wait_window.geometry("500x200")
+    wait_window.title("Remaining Time")
 
-    label = tkinter.Label(wait_window, text=f"Remaining Wait Time: {resize_wait_time} seconds")
-    label.pack()
+    # Parent used for setting label vertically centered
+    parent = tkinter.Frame(wait_window)
+
+    wait_window.geometry("400x200")
+
+    # Sets the window to always on top
+    wait_window.attributes("-topmost", True)
+
+    label = tkinter.Label(parent, text=f"Remaining Wait Time: {resize_wait_time} seconds")
+    label.pack(fill='x')
 
     label.after(1000, update_label)
+    parent.pack(expand=1)
+
     wait_window.mainloop()
 
 
@@ -270,9 +337,14 @@ def begin(resizingWaitTime, const_printing_interval):
 
 
     # Handling Errors
-    app.License.IAgree.click()
-    app.EzCad.Ok.click()
-    app.EzCad.Ok.click()
+    if app.License.exists():
+        app.License.IAgree.click()
+
+    if app.EzCad.exists():
+        app.EzCad.Ok.click()
+
+    if app.EzCad.exists():
+        app.EzCad.Ok.click()
 
 
     # Pause code's execuition untill the application gets loaded
@@ -347,23 +419,23 @@ def begin(resizingWaitTime, const_printing_interval):
 class GUI:
     def __init__(self, root):
         self.root = root
-        self.root.minsize(620, 250)
-        self.root.maxsize(620, 250)
+        self.root.minsize(620, 350)
+        self.root.maxsize(620, 350)
         self.root.title("EzCad Automator")
-
-
-        self.select_file_section = tkinter.LabelFrame(self.root, text="Import File")
 
 
         # window variables
         self.file_location = tkinter.StringVar()
         self.no_of_layers = tkinter.IntVar()
-        self.no_of_layers.set(0)
+        self.no_of_layers.set(-1)
         self.layer_count_message = tkinter.StringVar()
         self.const_printing_interval = tkinter.IntVar()
         self.const_printing_interval.set(0)
         self.resizing_wait_time = tkinter.IntVar()
         self.resizing_wait_time.set(45)
+
+
+        self.select_file_section = tkinter.LabelFrame(self.root, text="Import File")
 
 
         # Browse and input file url to be imported in Ezcad
@@ -389,11 +461,29 @@ class GUI:
         self.resizing_wait_time_entry = tkinter.Entry(self.select_file_section, textvariable=self.resizing_wait_time, width=15, relief="groove")
         self.resizing_wait_time_entry.grid(row=2, column=1, padx=10, pady=10)
 
-        self.start_button = tkinter.Button(self.select_file_section, text="Start", command=self.start_process, width=15, relief="groove")
-        self.start_button.grid(row=3, column=0, pady=10)
-
 
         self.select_file_section.grid(padx=10, pady=10)
+
+
+
+        self.calculate_layers_section = tkinter.LabelFrame(self.root, text="Click to calculate number of layers")
+
+
+        self.start_button = tkinter.Button(self.calculate_layers_section, text="Calculate number of Layers", command=self.calc_no_of_layers, width=30, relief="groove")
+        self.start_button.grid(row=0, column=0, padx=10, pady=10)
+
+        global calculated_no_of_layers_label
+        calculated_no_of_layers_label = tkinter.Label(self.calculate_layers_section, text=f"Ans: {self.no_of_layers.get()} layers")
+        calculated_no_of_layers_label.grid(row=0, column=1, padx=10, pady=10)
+        calculated_no_of_layers_label.grid_remove()
+
+
+        self.start_button = tkinter.Button(self.calculate_layers_section, text="Start", command=self.start_process, width=15, relief="groove")
+        self.start_button.grid(row=1, column=0, pady=10, columnspan=2)
+
+        self.calculate_layers_section.grid(padx=10, pady=10)
+        
+
 
 
 
@@ -409,23 +499,28 @@ class GUI:
     def calc_no_of_layers(self):
 
         # parse the SVG file
-        doc = xml.dom.minidom.parse(self.file_location.get())
+        if (self.file_location.get() != ''):
+            doc = xml.dom.minidom.parse(self.file_location.get())
 
-        # count the number of 'g' elements (layers)
-        layers = doc.getElementsByTagName('g')
-        num_layers = len(layers)
+            # count the number of 'g' elements (layers)
+            layers = doc.getElementsByTagName('g')
+            num_layers = len(layers)
 
-        self.no_of_layers.set(num_layers)
+            self.no_of_layers.set(num_layers)
 
-        print(f'There are {num_layers} layers in this SVG file.')
-
+            # Set global 'resizing_wait_time_label' to display the calculate number of layers
+            global calculated_no_of_layers_label
+            calculated_no_of_layers_label.config(text=f"{self.no_of_layers.get()} layers")
+            calculated_no_of_layers_label.grid()
+            
 
 
     def start_process(self):
 
         if(self.file_location.get()):   # If file location is selected, only then should the program start
             gui_root.destroy()
-            self.calc_no_of_layers()
+            if(self.no_of_layers.get() == -1):
+                self.calc_no_of_layers()
             begin(self.resizing_wait_time.get(), self.const_printing_interval.get())
 
 
