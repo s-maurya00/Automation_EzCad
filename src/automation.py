@@ -293,7 +293,7 @@ def waitForResizing(resize_wait_time):
 
     wait_window = tkinter.Tk()
     wait_window.title("Time for arranging windows")
-    wait_window.wm_iconbitmap("./automated.ico")
+    wait_window.wm_iconbitmap("../assets/automated.ico")
 
     # Parent used for setting label vertically centered
     parent = tkinter.Frame(wait_window)
@@ -356,7 +356,7 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     gui_controls_root = tkinter.Tk()
     
     gui_controls_root.title("Automator controls")
-    gui_controls_root.wm_iconbitmap("./automated.ico")
+    gui_controls_root.wm_iconbitmap("../assets/automated.ico")
     gui_controls_root.minsize(350, 200)
     gui_controls_root.maxsize(350, 200)
 
@@ -476,7 +476,7 @@ class GUI:
         self.root.minsize(620, 450)
         self.root.maxsize(620, 450)
         self.root.title("EzCad Automator")
-        self.root.wm_iconbitmap("./automated.ico")
+        self.root.wm_iconbitmap("../assets/automated.ico")
 
 
         # window variables
