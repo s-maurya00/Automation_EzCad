@@ -99,7 +99,7 @@ def selectFirstObjectInList(EzCadAppRef, loopCount):
 def setXtoZero(EzCadAppRef):
     # Sets the X axis position of current object to "0" and applies it
 
-    EzCadAppRef[u'PositionEdit'].type_keys('{END}+{HOME}0')
+    EzCadAppRef[u'Edit2'].type_keys('{END}+{HOME}0')
     EzCadAppRef[u'&Apply'].click_input()
 
 
@@ -201,15 +201,15 @@ def selectMarkingProperty(EzCadAppRef, iter, loopCount):
 
 
 # INCOMPLETE
-def startMarking(EzCadAppRef):
+def startMarking(EzCadAppRef, marking_time):
     # Start the Marking process
 
     EzCadAppRef[u'Mark(F2)'].click_input()
-    time.sleep(15)   # Sleep till the printing is completed
+    time.sleep(marking_time)   # Sleep till the printing is completed
 
 
 
-def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval):
+def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
     # Performs all relevant steps for all the available objects
 
     # global should_pause
@@ -236,7 +236,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
         selectMarkingProperty(EzCadAppRef, 0, i)
 
         time.sleep(0.5)
-        startMarking(EzCadAppRef)
+        startMarking(EzCadAppRef, marking_time)
 
         time.sleep(0.5)
         clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
@@ -245,7 +245,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
         selectMarkingProperty(EzCadAppRef, 1, i)
 
         time.sleep(0.5)
-        startMarking(EzCadAppRef)
+        startMarking(EzCadAppRef, marking_time)
 
         time.sleep(0.5)
         send_keys('{DELETE}')
@@ -322,6 +322,9 @@ def waitForResizing(resize_wait_time):
     label = tkinter.Label(parent, text=f"Remaining Wait Time: {resize_wait_time} seconds")
     label.pack(fill='x')
 
+    resizing_wait_time_label = tkinter.Label(parent, text="Manually select \"View Workspace\" button")
+    resizing_wait_time_label.pack(padx=10, pady=10)
+
     label.after(1000, update_label)
     parent.pack(expand=1)
 
@@ -330,7 +333,7 @@ def waitForResizing(resize_wait_time):
 
 
 
-def begin(resizingWaitTime, const_printing_interval):
+def begin(resizingWaitTime, const_printing_interval, marking_time):
 
     app = Application().start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
     EzCadAppRef = app[u'EzCad2.14.11 - No title']
@@ -412,15 +415,15 @@ def begin(resizingWaitTime, const_printing_interval):
     thread.start()
     """
     time.sleep(1)
-    print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval)
+    print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
 
 
 
 class GUI:
     def __init__(self, root):
         self.root = root
-        self.root.minsize(620, 350)
-        self.root.maxsize(620, 350)
+        self.root.minsize(620, 450)
+        self.root.maxsize(620, 450)
         self.root.title("EzCad Automator")
 
 
@@ -430,9 +433,11 @@ class GUI:
         self.no_of_layers.set(-1)
         self.layer_count_message = tkinter.StringVar()
         self.const_printing_interval = tkinter.IntVar()
-        self.const_printing_interval.set(0)
+        self.const_printing_interval.set(40)
         self.resizing_wait_time = tkinter.IntVar()
         self.resizing_wait_time.set(45)
+        self.marking_time = tkinter.IntVar()
+        self.marking_time.set(10)
 
 
         self.select_file_section = tkinter.LabelFrame(self.root, text="Import File")
@@ -447,7 +452,7 @@ class GUI:
 
 
         # Take input for setting constant interval between printing of each layer
-        self.const_printing_interval_label = tkinter.Label(self.select_file_section, text="Enter constant printing wait time (default is 0 sec)")
+        self.const_printing_interval_label = tkinter.Label(self.select_file_section, text="Next Layer Delay")
         self.const_printing_interval_label.grid(row=1, column=0, padx=10, pady=10)
 
         self.const_printing_interval_entry = tkinter.Entry(self.select_file_section, textvariable=self.const_printing_interval, width=15, relief="groove")
@@ -455,11 +460,22 @@ class GUI:
 
 
         # Take input for time to wait for user to resize their windows as they see fit
-        self.resizing_wait_time_label = tkinter.Label(self.select_file_section, text="Enter resizing wait time (default is 45 sec)")
+        self.resizing_wait_time_label = tkinter.Label(self.select_file_section, text="Window Resizing time")
         self.resizing_wait_time_label.grid(row=2, column=0, padx=10, pady=10)
 
         self.resizing_wait_time_entry = tkinter.Entry(self.select_file_section, textvariable=self.resizing_wait_time, width=15, relief="groove")
         self.resizing_wait_time_entry.grid(row=2, column=1, padx=10, pady=10)
+
+
+        self.select_file_section.grid(padx=10, pady=10)
+
+
+        # Take input for time to wait for marking to complete
+        self.marking_time_label = tkinter.Label(self.select_file_section, text="Contour Marking time")
+        self.marking_time_label.grid(row=3, column=0, padx=10, pady=10)
+
+        self.marking_time_entry = tkinter.Entry(self.select_file_section, textvariable=self.marking_time, width=15, relief="groove")
+        self.marking_time_entry.grid(row=3, column=1, padx=10, pady=10)
 
 
         self.select_file_section.grid(padx=10, pady=10)
@@ -521,7 +537,7 @@ class GUI:
             gui_root.destroy()
             if(self.no_of_layers.get() == -1):
                 self.calc_no_of_layers()
-            begin(self.resizing_wait_time.get(), self.const_printing_interval.get())
+            begin(self.resizing_wait_time.get(), self.const_printing_interval.get(), self.marking_time.get())
 
 
 gui_root = tkinter.Tk()
