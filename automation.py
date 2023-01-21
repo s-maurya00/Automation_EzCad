@@ -1,11 +1,13 @@
-import time, tkinter
-import xml.dom.minidom
-import win32gui
+import threading, time, tkinter, win32gui, xml.dom.minidom
+
 import pyautogui
 
 from pywinauto.application import Application
 from pywinauto.keyboard import send_keys
+
 from tkinter import filedialog, messagebox
+
+
 
 
 
@@ -17,7 +19,17 @@ INPUTS:
     Add PAUSE and RESUME features which are mandatory
 
     19-01-2023
-    Take Marking delay input from the user in seconds 
+    Take Marking delay input from the user in seconds
+    
+    21-01-2023(Tasks)
+    To add play pause and resume functionality --> DONE
+    To Implement Threading approach --> DONE
+    To set marking wait time for window to disappear
+    To declare the current_loop_count variable such that it is not above print3dItem function (it just looks ugly nothing else)
+    To update the layer count dynamically in the 'Automation Controls' GUI window
+    
+    Break file into multiple small functional files and test its working
+
 
 FUTURE WORK:
     Remove the error functions,
@@ -28,66 +40,23 @@ FUTURE WORK:
 """
 
 
-"""
-# This is the section responsible for the pause and play buttons functioning
-should_pause = False
-
-class GUI_controls():
-
-    def __init__(self, root):
-        self.root = root
-        self.root.minsize(350, 200)
-        self.root.maxsize(350, 200)
-        self.root.title("EzCad Automator controls")
-
-        self.control_section = tkinter.LabelFrame(self.root, text="Controls")
-
-        # Sets the window to always on top
-        self.root.attributes("-topmost", True)
-
-
-        # window variables
-        # current_loop_count = 
-
-        self.start_pause = tkinter.Button(self.control_section, text="Pause", command=self.pause_process, width=16, relief="groove")
-        self.start_pause.grid(row=1, column=1, padx=10, pady=10)
-
-        self.start_resume = tkinter.Button(self.control_section, text="Resume", command=self.resume_process, width=16, relief="groove")
-        self.start_resume.grid(row=1, column=2, padx=10, pady=10)
-
-        self.control_section.grid(row=0, padx=10, pady=10)
-
-        self.layer_info_frame = tkinter.LabelFrame(self.root, text="Layer Information")
-
-        self.layer_info = tkinter.Label(self.layer_info_frame, text=f"Printing layer: 12 of 275")
-        self.layer_info.grid(row=2, padx=50, pady=10)
-
-        self.layer_info_frame.grid(row=3, padx=10, pady=10)
-
-    
-    def pause_process(self):
-        global should_pause
-        should_pause = True
-
-    def resume_process(self):
-        global should_pause
-        should_pause = False
-"""
 
 
 
-
-
-
-def selectFirstObjectInList(EzCadAppRef, loopCount):
+def selectFirstObjectInList(EzCadAppRef):
     # Selects the first item to be printed from the available objects in the object list
 
-    if(loopCount == 0):     # This reduces the PC Load by only having to click outside the Object List box ONCE
-        # Select the "Edit Node" Tool
-        EzCadAppRef[u'Toolbar3'].button(1).click()
+    # Set the focus to the EzCad software window
+    time.sleep(0.1)
+    EzCadAppRef.set_focus()
+    time.sleep(0.1)
 
-        # Reselect the "Pick" Tool
-        EzCadAppRef[u'Toolbar3'].button(0).click()
+    # if(loopCount == 0):     # This reduces the PC Load by only having to click outside the Object List box ONCE
+    # Select the "Edit Node" Tool
+    EzCadAppRef[u'Toolbar3'].button(1).click()
+
+    # Reselect the "Pick" Tool
+    EzCadAppRef[u'Toolbar3'].button(0).click()
 
     # Click the title of "Object List"
     objectHeader = EzCadAppRef[u'Header']
@@ -96,16 +65,29 @@ def selectFirstObjectInList(EzCadAppRef, loopCount):
     send_keys('{HOME}')
 
 
+
 def setXtoZero(EzCadAppRef):
     # Sets the X axis position of current object to "0" and applies it
+
+    # Set the focus to the EzCad software window
+    time.sleep(0.1)
+    EzCadAppRef.set_focus()
+    time.sleep(0.1)
 
     EzCadAppRef[u'Edit2'].type_keys('{END}+{HOME}0')
     EzCadAppRef[u'&Apply'].click_input()
 
 
+
 def hatchObject(app, EzCadAppRef, loopCount):
     # Hatches the current object and press 'OK'
 
+    # Set the focus to the EzCad software window
+    time.sleep(0.1)
+    EzCadAppRef.set_focus()
+    time.sleep(0.1)
+
+    # Open Hatching Menu window
     EzCadAppRef.menu_item(u'&Edit->Hatch\\tCtrl+H').click()
 
     time.sleep(0.5)
@@ -119,8 +101,14 @@ def hatchObject(app, EzCadAppRef, loopCount):
         app.Hatch[u'&OK'].click_input()
 
 
+
 def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
     # Enable OR Disable the hatching checkbox in the "Hatching" Table and click "Apply"
+
+    # Set the focus to the EzCad software window
+    time.sleep(0.1)
+    EzCadAppRef.set_focus()
+    time.sleep(0.1)
 
     if(setCheckmarkTo == 0):   # '0' signifies that the checkbox has to be unchecked
         EzCadAppRef[u'Enable'].uncheck()
@@ -131,8 +119,14 @@ def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
         EzCadAppRef[u'&Apply'].click_input()
 
 
+
 def selectMarkingProperty(EzCadAppRef, iter, loopCount):
     # Selects either 'black' or 'blue' marking property based on the 'iter' value
+
+    # Set the focus to the EzCad software window
+    time.sleep(0.1)
+    EzCadAppRef.set_focus()
+    time.sleep(0.1)
 
     if(iter == 0):  # Black color parameters
         
@@ -182,25 +176,8 @@ def selectMarkingProperty(EzCadAppRef, iter, loopCount):
             # Click Apply button
             EzCadAppRef[u'&Apply2'].click()
 
-    # # Uncheck default param
-    # if(EzCadAppRef[u'Use default param'].get_check_state()):
-    #     EzCadAppRef[u'Use default param'].click()
-
-    # # Set Speed(MM/Second)
-    # EzCadAppRef[u'Spin1'].click()
-    # speed = 10
-    # send_keys(f"{speed}")
-
-    # # Set Power%
-    # EzCadAppRef[u'Spin2'].click()
-    # power = 10
-    # send_keys(f"{power}")
-
-    # # Click Apply button
-    # EzCadAppRef[u'&Apply2'].click()
 
 
-# INCOMPLETE
 def startMarking(EzCadAppRef, marking_time):
     # Start the Marking process
 
@@ -209,31 +186,29 @@ def startMarking(EzCadAppRef, marking_time):
 
 
 
+current_loop_count = 0
 def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
     # Performs all relevant steps for all the available objects
 
-    # global should_pause
+    global should_pause, current_loop_count
 
-    for i in range(0, numberOfObjectsInSVG):
+    while((current_loop_count < numberOfObjectsInSVG) and (should_pause != True)):
 
-        print("\nWorking on Layer: ", i+1)
+        print("\nWorking on Layer: ", current_loop_count + 1)
 
-        # while(should_pause):
-        #     time.sleep(0.1)
-
-        selectFirstObjectInList(EzCadAppRef, i)
+        selectFirstObjectInList(EzCadAppRef)
 
         time.sleep(0.5)
         setXtoZero(EzCadAppRef)
 
         time.sleep(0.5)
-        hatchObject(app, EzCadAppRef, i)
+        hatchObject(app, EzCadAppRef, current_loop_count)
 
         time.sleep(0.5)
         clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
 
         time.sleep(0.5)
-        selectMarkingProperty(EzCadAppRef, 0, i)
+        selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
 
         time.sleep(0.5)
         startMarking(EzCadAppRef, marking_time)
@@ -242,23 +217,36 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
         clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
 
         time.sleep(0.5)
-        selectMarkingProperty(EzCadAppRef, 1, i)
+        selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
 
         time.sleep(0.5)
         startMarking(EzCadAppRef, marking_time)
 
-        time.sleep(0.5)
+        # Set the focus to the EzCad software window
+        time.sleep(0.1)
+        EzCadAppRef.set_focus()
+        time.sleep(0.1)
+
         send_keys('{DELETE}')
 
-        # Constant time that this function will pause between printing of each layer
-        time.sleep(const_printing_interval)
+        if(should_pause != True):   # To check if pause has been pressed while printing, if 'yes', then don't sleep for new layer printing
+            # Constant time that this function will pause between printing of each layer
+            time.sleep(const_printing_interval)
+    
+        current_loop_count += 1
+
+
+    if(should_pause == True):
+        print("\nPaused")
+    elif(should_pause == False):
+        print("\nResumed")
 
 
 
 
 def moveAppToRightSide():
     
-    successStatus = False
+    # successStatus = False
     pyautogui.FAILSAFE = False
     
     # Find the Notepad window
@@ -277,26 +265,21 @@ def moveAppToRightSide():
         pyautogui.dragTo(screen_width, screen_height/2, duration=0.5)
         # Release the click
         pyautogui.mouseUp()
-        successStatus = True
+        # successStatus = True
 
     else:
-        time.sleep(2)
-        error_box = tkinter.Tk()
-        error_box.title("Error")
+        messagebox.showerror("Error", "Unable to Auto-Reposition the window.")
+        print("\nMyError: Window named \"EzCad2.14.11\" not was found.")
+        # successStatus = False
 
-        messagebox.showerror("Error", "Could not find open EzCad software window.")
-
-        error_box.mainloop()
-        print("EzCad2.14.11 not found")
-
-    return successStatus
+    # return successStatus
 
 
 
 
 def waitForResizing(resize_wait_time):
 
-    def update_label():
+    def update_remaining_time():
         nonlocal resize_wait_time
         resize_wait_time -= 1
 
@@ -306,10 +289,11 @@ def waitForResizing(resize_wait_time):
             wait_window.destroy()
             time.sleep(1)
             return
-        label.after(1000, update_label)
+        label.after(1000, update_remaining_time)
 
     wait_window = tkinter.Tk()
-    wait_window.title("Remaining Time")
+    wait_window.title("Time for arranging windows")
+    wait_window.wm_iconbitmap("./automated.ico")
 
     # Parent used for setting label vertically centered
     parent = tkinter.Frame(wait_window)
@@ -325,7 +309,7 @@ def waitForResizing(resize_wait_time):
     resizing_wait_time_label = tkinter.Label(parent, text="Manually select \"View Workspace\" button")
     resizing_wait_time_label.pack(padx=10, pady=10)
 
-    label.after(1000, update_label)
+    label.after(1000, update_remaining_time)
     parent.pack(expand=1)
 
     wait_window.mainloop()
@@ -333,9 +317,91 @@ def waitForResizing(resize_wait_time):
 
 
 
+
+def play_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
+    print("\nStarting the Printing Process")
+    global should_pause, thread
+    should_pause = False
+    thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
+    thread.start()
+
+
+
+def pause_process():
+    print("\nPause Pressed")
+    global should_pause
+    should_pause = True
+    print("\nWaiting for current loop to complete execution")
+
+
+
+def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
+    print("\nResume Pressed")
+    global should_pause, thread
+    should_pause = False
+    time.sleep(1)
+    thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
+    thread.start()
+
+
+
+def update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root):
+    layer_info.config(text=f"Printing layer: 1 of {numberOfObjectsInSVG}")
+    gui_controls_root.after(1000, lambda: update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root))
+
+
+
+def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
+    # Create the GUI window of controls on screen
+    gui_controls_root = tkinter.Tk()
+    
+    gui_controls_root.title("Automator controls")
+    gui_controls_root.wm_iconbitmap("./automated.ico")
+    gui_controls_root.minsize(350, 200)
+    gui_controls_root.maxsize(350, 200)
+
+    gui_controls_root.attributes("-topmost", True)
+
+    gui_control_frame = tkinter.LabelFrame(gui_controls_root, text="Controls")
+
+
+    play_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
+
+
+    pause_button = tkinter.Button(gui_control_frame, text="Pause", command=pause_process, width=16, relief="groove")
+    pause_button.grid(row=1, column=1, padx=10, pady=10)
+
+    resume_button = tkinter.Button(gui_control_frame, text="Resume", command=lambda: resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time), width=16, relief="groove")
+    resume_button.grid(row=1, column=2, padx=10, pady=10)
+
+    gui_control_frame.grid(row=0, padx=10, pady=10)
+
+
+    layer_info_frame = tkinter.LabelFrame(gui_controls_root, text="Layer Information")
+
+    layer_info = tkinter.Label(layer_info_frame, text=f"Printing layer: 1 of {numberOfObjectsInSVG}")
+    layer_info.grid(row=2, padx=50, pady=10)
+    update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root)
+
+    layer_info_frame.grid(row=3, padx=10, pady=10)
+
+
+    gui_controls_root.mainloop()
+
+
+    def print3d_thread(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
+        print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
+
+    thread = threading.Thread(target=print3d_thread, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
+    thread.start()
+
+
+
+
+
 def begin(resizingWaitTime, const_printing_interval, marking_time):
 
-    app = Application().start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
+    app = Application(backend='win32').start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
     EzCadAppRef = app[u'EzCad2.14.11 - No title']
 
 
@@ -398,24 +464,9 @@ def begin(resizingWaitTime, const_printing_interval, marking_time):
     numberOfObjectsInSVG = gui.no_of_layers.get()
 
 
+    createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
 
-    """
-    # Create the GUI window of controls on screen
-    gui_controls_root = tkinter.Tk()
-    gui_controls = GUI_controls(gui_controls_root)
 
-    # gui_controls_root.after(1, print3dItem, app, EzCadAppRef, numberOfObjectsInSVG)  # This lets the print3dItem function to execuite even after the new gui is created
-
-    gui_controls_root.mainloop()
-
-    def print3d_thread():
-        print3dItem(app, EzCadAppRef, numberOfObjectsInSVG)
-
-    thread = threading.Thread(target=print3d_thread)
-    thread.start()
-    """
-    time.sleep(1)
-    print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
 
 
 
@@ -425,6 +476,7 @@ class GUI:
         self.root.minsize(620, 450)
         self.root.maxsize(620, 450)
         self.root.title("EzCad Automator")
+        self.root.wm_iconbitmap("./automated.ico")
 
 
         # window variables
@@ -499,8 +551,6 @@ class GUI:
 
         self.calculate_layers_section.grid(padx=10, pady=10)
         
-
-
 
 
     def browse_file(self):
