@@ -190,7 +190,7 @@ current_loop_count = 0
 def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
     # Performs all relevant steps for all the available objects
 
-    global should_pause, current_loop_count
+    global should_pause, is_paused, current_loop_count
 
     while((current_loop_count < numberOfObjectsInSVG) and (should_pause != True)):
 
@@ -238,8 +238,10 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
     if(should_pause == True):
         print("\nPaused")
+        is_paused = True
     elif(should_pause == False):
         print("\nResumed")
+        is_paused = False
 
 
 
@@ -319,35 +321,63 @@ def waitForResizing(resize_wait_time):
 
 
 def play_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
-    print("\nStarting the Printing Process")
-    global should_pause, thread
+    global should_pause, is_paused, thread
+
+    # should_pause is used to tell the print3dItem function that the pause button has been pressed and the function has to be stopped after execution of current cycle which may take some "x" seconds
+    # is_paused is used to know whether the "x" seconds required for the print3dItem function has been completed and the function has truely stopped
     should_pause = False
+    is_paused = False
+
+    print("\nStarting the Printing Process")
+
     thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
     thread.start()
 
 
 
 def pause_process():
-    print("\nPause Pressed")
-    global should_pause
+    global should_pause, is_paused
     should_pause = True
+
+    if(is_paused == False):
+        print("\nPause Pressed")
+    else:
+        print("\nProcess is already PAUSED")
+        return
+
     print("\nWaiting for current loop to complete execution")
 
 
 
-def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
-    print("\nResume Pressed")
-    global should_pause, thread
+def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time, layer_info, gui_controls_root):
+    global should_pause, thread, is_paused
     should_pause = False
-    time.sleep(1)
-    thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
-    thread.start()
+
+    if(is_paused):
+        print("\nResume Pressed")
+    else:
+        print("\nProcess is already RUNNING")
+        return
+
+    time.sleep(0.1) # Just for Safety purpose as parallel execution of process may give rise to errors
+    if(is_paused):
+        is_paused = False
+        
+        thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
+        thread.start()
+
+        update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root)
+
 
 
 
 def update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root):
-    layer_info.config(text=f"Printing layer: 1 of {numberOfObjectsInSVG}")
-    gui_controls_root.after(1000, lambda: update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root))
+    global current_loop_count, should_pause
+
+    layer_info.config(text=f"Printing layer: {current_loop_count + 1} of {numberOfObjectsInSVG}")
+
+    if(should_pause == False):
+        gui_controls_root.after(1000, lambda: update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root))
 
 
 
@@ -371,7 +401,7 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     pause_button = tkinter.Button(gui_control_frame, text="Pause", command=pause_process, width=16, relief="groove")
     pause_button.grid(row=1, column=1, padx=10, pady=10)
 
-    resume_button = tkinter.Button(gui_control_frame, text="Resume", command=lambda: resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time), width=16, relief="groove")
+    resume_button = tkinter.Button(gui_control_frame, text="Resume", command=lambda: resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time, layer_info, gui_controls_root), width=16, relief="groove")
     resume_button.grid(row=1, column=2, padx=10, pady=10)
 
     gui_control_frame.grid(row=0, padx=10, pady=10)
