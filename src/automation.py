@@ -18,9 +18,11 @@ INPUTS:
     Time taken by Mark(F2) function (not 100% sure)
     Add PAUSE and RESUME features which are mandatory
 
+
     19-01-2023
     Take Marking delay input from the user in seconds
     
+
     21-01-2023(Tasks)
     To add play pause and resume functionality --> DONE
     To Implement Threading approach --> DONE
@@ -29,6 +31,17 @@ INPUTS:
     To update the layer count dynamically in the 'Automation Controls' GUI window
     
     Break file into multiple small functional files and test its working
+
+
+    25-01-2023(Tasks done)
+    To update layer count in GUI dynamically
+    To correct the calculate_number_of_layers button in the gui
+    To resolve infinite threding problem
+    To set mark function to wait till window disappears
+
+    Layer count updation in automation control's GUI window
+    Resolved problem of Creation of infinitely multiple threads in Control's resume function
+
 
 
 FUTURE WORK:
@@ -295,7 +308,12 @@ def waitForResizing(resize_wait_time):
 
     wait_window = tkinter.Tk()
     wait_window.title("Time for arranging windows")
-    wait_window.wm_iconbitmap("../assets/automated.ico")
+
+    try:
+        wait_window.wm_iconbitmap("../assets/automated.ico")
+    except:
+        pass
+
 
     # Parent used for setting label vertically centered
     parent = tkinter.Frame(wait_window)
@@ -386,7 +404,12 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     gui_controls_root = tkinter.Tk()
     
     gui_controls_root.title("Automator controls")
-    gui_controls_root.wm_iconbitmap("../assets/automated.ico")
+
+    try:
+        gui_controls_root.wm_iconbitmap("../assets/automated.ico")
+    except:
+        pass
+
     gui_controls_root.minsize(350, 200)
     gui_controls_root.maxsize(350, 200)
 
@@ -506,7 +529,12 @@ class GUI:
         self.root.minsize(620, 450)
         self.root.maxsize(620, 450)
         self.root.title("EzCad Automator")
-        self.root.wm_iconbitmap("../assets/automated.ico")
+
+        try:
+            self.root.wm_iconbitmap("../assets/automated.ico")
+        except:
+            pass
+
 
 
         # window variables
