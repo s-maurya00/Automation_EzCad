@@ -178,7 +178,7 @@ def selectMarkingProperty(EzCadAppRef, iter, loopCount):
 
             # Set Speed(MM/Second) for blue parameter
             EzCadAppRef[u'Spin1'].click()
-            speed = 180
+            speed = 160
             send_keys(f"{speed}")
 
             # Set Power% for blue parameter
@@ -197,6 +197,12 @@ def startMarking(EzCadAppRef, marking_time):
     EzCadAppRef[u'Mark(F2)'].click_input()
     time.sleep(marking_time)   # Sleep till the printing is completed
 
+    # while True:
+    #     if(EzCadAppRef[u'Mark'].exists()):   # If the Marking property window is open, wait 1 second and recheck if it's open, if yes then wait again else return from the function
+    #         time.sleep(1)
+    #     else:
+    #         break
+
 
 
 current_loop_count = 0
@@ -205,9 +211,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
     global should_pause, is_paused, current_loop_count
 
+    # Added code for deleting j1st layer item cause it's nesting NG code is not generated automatically
+    selectFirstObjectInList(EzCadAppRef)
+    send_keys('{DELETE}')
+    print("\nSuccessfully deleted layer 1 item!!")
+
     while((current_loop_count < numberOfObjectsInSVG) and (should_pause != True)):
 
-        print("\nWorking on Layer: ", current_loop_count + 1)
+        print("\nWorking on Layer: ", current_loop_count + 2)
 
         selectFirstObjectInList(EzCadAppRef)
 
@@ -410,8 +421,8 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     except:
         pass
 
-    gui_controls_root.minsize(350, 200)
-    gui_controls_root.maxsize(350, 200)
+    gui_controls_root.minsize(305, 170)
+    gui_controls_root.maxsize(305, 170)
 
     gui_controls_root.attributes("-topmost", True)
 
@@ -470,7 +481,7 @@ def begin(resizingWaitTime, const_printing_interval, marking_time):
 
 
     # Pause code's execuition untill the application gets loaded
-    EzCadAppRef.wait('ready')
+    # EzCadAppRef.wait('ready')     # Gives an error in Actual PC but not in mine
 
 
     # Double click titleBar of the window and drag it to right-corner to snap to the same
@@ -526,8 +537,8 @@ def begin(resizingWaitTime, const_printing_interval, marking_time):
 class GUI:
     def __init__(self, root):
         self.root = root
-        self.root.minsize(620, 450)
-        self.root.maxsize(620, 450)
+        self.root.minsize(502, 350)
+        self.root.maxsize(502, 350)
         self.root.title("EzCad Automator")
 
         try:
