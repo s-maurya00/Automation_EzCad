@@ -1,3 +1,4 @@
+# Date: 28-02-2023
 import threading, time, tkinter, win32gui, xml.dom.minidom
 
 import pyautogui
@@ -211,39 +212,50 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
     global should_pause, is_paused, current_loop_count
 
-    # Added code for deleting j1st layer item cause it's nesting NG code is not generated automatically
-    selectFirstObjectInList(EzCadAppRef)
-    send_keys('{DELETE}')
-    print("\nSuccessfully deleted layer 1 item!!")
+    # For myError_1; Added code for deleting just layer item cause it's nesting NG code is not generated automatically
+    if(current_loop_count == 0):
+        selectFirstObjectInList(EzCadAppRef)
+        send_keys('{DELETE}')
+        print("\nSuccessfully deleted layer 1 item!!")
+    # Delete above section when NC code for layer 1 is genereated automatically
 
     while((current_loop_count < numberOfObjectsInSVG) and (should_pause != True)):
 
+        # Change to current_loop_count + 1   when myError_1 is resolved
         print("\nWorking on Layer: ", current_loop_count + 2)
 
         selectFirstObjectInList(EzCadAppRef)
 
         time.sleep(0.5)
+        print("\t- Setting X coord to ZERO")
         setXtoZero(EzCadAppRef)
 
         time.sleep(0.5)
+        print("\t- Hatching the object")
         hatchObject(app, EzCadAppRef, current_loop_count)
 
         time.sleep(0.5)
+        print("\t- Enabling Hatching")
         clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
 
         time.sleep(0.5)
+        print("\t- Setting 1st Mark's Properties")
         selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
 
         time.sleep(0.5)
+        print("\t- Starting Marking")
         startMarking(EzCadAppRef, marking_time)
 
         time.sleep(0.5)
+        print("\t- Disabling Hatching")
         clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
 
         time.sleep(0.5)
+        print("\t- Setting 2nd Mark's Properties")
         selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
 
         time.sleep(0.5)
+        print("\t- Starting Marking")
         startMarking(EzCadAppRef, marking_time)
 
         # Set the focus to the EzCad software window
@@ -251,10 +263,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
         EzCadAppRef.set_focus()
         time.sleep(0.1)
 
+        print("\t- Deleting current layer item")
         send_keys('{DELETE}')
 
         if(should_pause != True):   # To check if pause has been pressed while printing, if 'yes', then don't sleep for new layer printing
             # Constant time that this function will pause between printing of each layer
+            print(f"\t- Waiting for 'Next Layer Delay: {const_printing_interval} sec' time")
             time.sleep(const_printing_interval)
     
         current_loop_count += 1
@@ -403,7 +417,8 @@ def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interv
 def update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root):
     global current_loop_count, should_pause
 
-    layer_info.config(text=f"Printing layer: {current_loop_count + 1} of {numberOfObjectsInSVG}")
+    # Change to current_loop_count + 1 when myError_1 is resolved
+    layer_info.config(text=f"Printing layer: {current_loop_count + 2} of {numberOfObjectsInSVG}")
 
     if(should_pause == False):
         gui_controls_root.after(1000, lambda: update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root))
@@ -414,7 +429,7 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     # Create the GUI window of controls on screen
     gui_controls_root = tkinter.Tk()
     
-    gui_controls_root.title("Automator controls")
+    gui_controls_root.title("Automation controls")
 
     try:
         gui_controls_root.wm_iconbitmap("../assets/automated.ico")
@@ -481,13 +496,13 @@ def begin(resizingWaitTime, const_printing_interval, marking_time):
 
 
     # Pause code's execuition untill the application gets loaded
-    # EzCadAppRef.wait('ready')     # Gives an error in Actual PC but not in mine
+    EzCadAppRef.wait('ready')
 
 
     # Double click titleBar of the window and drag it to right-corner to snap to the same
-    time.sleep(0.5)
+    time.sleep(2)
     moveAppToRightSide()
-    time.sleep(0.5)
+    time.sleep(2)
 
 
     # Wait for user to resize other windows
