@@ -380,15 +380,19 @@ def play_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval
 
 def pause_process():
     global should_pause, is_paused
-    should_pause = True
+    # should_pause = True
 
     if(is_paused == False):
-        print("\nPause Pressed")
+        if(should_pause == False):
+            print("\nPause Pressed (Waiting for current loop to complete it's execution)\n")
+            should_pause = True
+        else:
+            print("\nWaiting for current loop to complete execution\n")
     else:
         print("\nProcess is already PAUSED")
-        return
+        # return
 
-    print("\nWaiting for current loop to complete execution")
+    # print("Waiting for current loop to complete execution\n")
 
 
 
@@ -429,7 +433,7 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     # Create the GUI window of controls on screen
     gui_controls_root = tkinter.Tk()
     
-    gui_controls_root.title("Automation controls")
+    gui_controls_root.title("Automator controls")
 
     try:
         gui_controls_root.wm_iconbitmap("../assets/automated.ico")
