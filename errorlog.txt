@@ -1,0 +1,330 @@
+2023-03-01 21:24:54,600 - ERROR - 
+
+
+Error in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:24:54.593479 in clickEnableInHatching(0)
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 462, in print3dItem
+    selectLastObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 89, in selectLastObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:25:02,333 - ERROR - 
+
+
+Error number(1), while retrying clickEnableInHatching(0) in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:25:02.333748
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 480, in print3dItem
+    selectLastObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 89, in selectLastObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:25:08,460 - ERROR - 
+
+
+Error number(2), while retrying clickEnableInHatching(0) in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:25:08.460978
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 480, in print3dItem
+    selectLastObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 89, in selectLastObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:25:14,599 - ERROR - 
+
+
+Error number(3), while retrying clickEnableInHatching(0) in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:25:14.599582
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 480, in print3dItem
+    selectLastObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 89, in selectLastObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:25:14,600 - ERROR - 
+
+
+ MAX error retry count exceeded in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:25:14.600878 in clickEnableInHatching(0). Hence, Program is now paused.
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 462, in print3dItem
+    selectLastObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 89, in selectLastObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:26:22,075 - ERROR - 
+
+
+Error in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:26:22.075443 in setXtoZero
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 252, in print3dItem
+    selectFirstObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 66, in selectFirstObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:26:28,218 - ERROR - 
+
+
+Error number(1), while retrying setXtoZero in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:26:28.218174
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 270, in print3dItem
+    selectFirstObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 66, in selectFirstObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:26:34,332 - ERROR - 
+
+
+Error number(2), while retrying setXtoZero in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:26:34.332233
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 270, in print3dItem
+    selectFirstObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 66, in selectFirstObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:26:40,471 - ERROR - 
+
+
+Error number(3), while retrying setXtoZero in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:26:40.471696
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 270, in print3dItem
+    selectFirstObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 66, in selectFirstObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'
+2023-03-01 21:26:40,472 - ERROR - 
+
+
+ MAX error retry count exceeded in file automation.py on LAPTOP-6K0DABG4 at 2023-03-01 21:26:40.472697 in setXtoZero. Hence, Program is now paused.
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 250, in __resolve_control
+    ctrl = wait_until_passes(
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 458, in wait_until_passes
+    raise err
+pywinauto.timings.TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 252, in print3dItem
+    selectFirstObjectInList(EzCadAppRef)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\src\automation.py", line 66, in selectFirstObjectInList
+    EzCadAppRef.set_focus()
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 396, in __getattribute__
+    ctrls = self.__resolve_control(self.criteria)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 261, in __resolve_control
+    raise e.original_exception
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\timings.py", line 436, in wait_until_passes
+    func_val = func(*args, **kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\application.py", line 203, in __get_ctrl
+    dialog = self.backend.generic_wrapper_class(findwindows.find_element(**criteria[0]))
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 84, in find_element
+    elements = find_elements(**kwargs)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findwindows.py", line 305, in find_elements
+    elements = findbestmatch.find_best_control_matches(best_match, wrapped_elems)
+  File "D:\Programs\3_Project\Windows\Software_Automation\IITB_EzCadAutomation\env2\lib\site-packages\pywinauto\findbestmatch.py", line 536, in find_best_control_matches
+    raise MatchError(items = name_control_map.keys(), tofind = search_text)
+pywinauto.findbestmatch.MatchError: Could not find 'EzCad2.14.11 - No title' in 'dict_keys([])'

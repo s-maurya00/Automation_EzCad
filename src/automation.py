@@ -261,8 +261,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while setting X to Zero!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -274,13 +273,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Setting X coord to ZERO")
                     setXtoZero(EzCadAppRef)
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying setXtoZero in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying setXtoZero in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in setXtoZero. Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
         try:
@@ -296,8 +303,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while Hatching Object!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -309,13 +315,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Hatching the object")
                     hatchObject(app, EzCadAppRef, current_loop_count)
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying hatchObject in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying hatchObject in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in hatchObject. Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
         try:
@@ -331,8 +345,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while Enabling Hatching!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -344,13 +357,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Enabling Hatching")
                     clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying clickEnableInHatching(1) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying clickEnableInHatching(1) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in clickEnableInHatching(1). Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
         try:
@@ -366,8 +387,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while setting 1st Mark's Property!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -379,13 +399,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Setting 1st Mark's Properties")
                     selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying selectMarkingProperty(0) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying selectMarkingProperty(0) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in selectMarkingProperty(0). Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
         try:
@@ -401,8 +429,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while starting Marking process!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -414,13 +441,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Starting Marking")
                     startMarking(EzCadAppRef, marking_time)
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying startMarking in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying startMarking in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in startMarking. Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
         try:
@@ -436,8 +471,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while Disabling Hatching!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -449,13 +483,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Disabling Hatching")
                     clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying clickEnableInHatching(0) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying clickEnableInHatching(0) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in clickEnableInHatching(0). Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
         try:
@@ -471,8 +513,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while setting 2nd Mark's Property!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -484,13 +525,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Setting 2nd Mark's Properties")
                     selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying selectMarkingProperty(1) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying selectMarkingProperty(1) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in selectMarkingProperty(1). Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
         try:
@@ -506,8 +555,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             # Retry the function call up to 3 times
             while retries < 3:
                 print("\nSome unexpected error occured while starting Marking process!!!")
-                retries += 1
-                print(f"\nRetry number: {retries}")
+                print(f"\nRetry number: {retries + 1}")
                 time.sleep(1)
 
                 try:
@@ -519,13 +567,21 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                     print("\t- Starting Marking")
                     startMarking(EzCadAppRef, marking_time)
 
-                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
                     break
 
                 except:
-                    logging.exception(f'\n\n\nError number({retries}), while retrying startMarking in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
-                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+                    logging.exception(f'\n\n\nError number({retries + 1}), while retrying startMarking in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries + 1} UNSUCCESSFULL!!!")
+
+                retries += 1
+
+            if(retries == 3):
+                retries = 0
+                logging.exception(f'\n\n\n MAX error retry count exceeded in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in startMarking. Hence, Program is now paused.')
+                should_pause = True
+                break
 
 
 
