@@ -1,5 +1,5 @@
 # Date: 28-02-2023
-import threading, time, tkinter, win32gui, xml.dom.minidom
+import threading, time, os, datetime, tkinter, win32gui, xml.dom.minidom, logging, socket
 
 import pyautogui
 
@@ -9,7 +9,8 @@ from pywinauto.keyboard import send_keys
 from tkinter import filedialog, messagebox
 
 
-
+# Basic config details of error logging file
+logging.basicConfig(filename='errorlog.txt', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 """
@@ -77,6 +78,28 @@ def selectFirstObjectInList(EzCadAppRef):
     objectHeader.click()
     # "Home" key selects the 1st element in the object list
     send_keys('{HOME}')
+
+
+
+def selectLastObjectInList(EzCadAppRef):
+    # Selects the Last item from the object list of available objects as it is the currently hatched item
+
+    # Set the focus to the EzCad software window
+    time.sleep(0.1)
+    EzCadAppRef.set_focus()
+    time.sleep(0.1)
+
+    # Select the "Edit Node" Tool
+    EzCadAppRef[u'Toolbar3'].button(1).click()
+
+    # Reselect the "Pick" Tool
+    EzCadAppRef[u'Toolbar3'].button(0).click()
+
+    # Click the title of "Object List"
+    objectHeader = EzCadAppRef[u'Header']
+    objectHeader.click()
+    # "End" key selects the Last element in the object list
+    send_keys('{END}')
 
 
 
@@ -207,10 +230,11 @@ def startMarking(EzCadAppRef, marking_time):
 
 
 current_loop_count = 0
+retries = 0
 def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
     # Performs all relevant steps for all the available objects
 
-    global should_pause, is_paused, current_loop_count
+    global should_pause, is_paused, current_loop_count, retries
 
     # For myError_1; Added code for deleting just layer item cause it's nesting NG code is not generated automatically
     if(current_loop_count == 0):
@@ -221,42 +245,289 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
     while((current_loop_count < numberOfObjectsInSVG) and (should_pause != True)):
 
-        # Change to current_loop_count + 1   when myError_1 is resolved
-        print("\nWorking on Layer: ", current_loop_count + 2)
+        try:
+            # Change to current_loop_count + 1   when myError_1 is resolved
+            print("\nWorking on Layer: ", current_loop_count + 2)
 
-        selectFirstObjectInList(EzCadAppRef)
+            selectFirstObjectInList(EzCadAppRef)
 
-        time.sleep(0.5)
-        print("\t- Setting X coord to ZERO")
-        setXtoZero(EzCadAppRef)
+            time.sleep(0.5)
+            print("\t- Setting X coord to ZERO")
+            setXtoZero(EzCadAppRef)
 
-        time.sleep(0.5)
-        print("\t- Hatching the object")
-        hatchObject(app, EzCadAppRef, current_loop_count)
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in setXtoZero')
 
-        time.sleep(0.5)
-        print("\t- Enabling Hatching")
-        clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while setting X to Zero!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
 
-        time.sleep(0.5)
-        print("\t- Setting 1st Mark's Properties")
-        selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
+                try:
+                    print("\nRetrying setting X to Zero: ")
 
-        time.sleep(0.5)
-        print("\t- Starting Marking")
-        startMarking(EzCadAppRef, marking_time)
+                    selectFirstObjectInList(EzCadAppRef)
 
-        time.sleep(0.5)
-        print("\t- Disabling Hatching")
-        clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
+                    time.sleep(0.5)
+                    print("\t- Setting X coord to ZERO")
+                    setXtoZero(EzCadAppRef)
 
-        time.sleep(0.5)
-        print("\t- Setting 2nd Mark's Properties")
-        selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
 
-        time.sleep(0.5)
-        print("\t- Starting Marking")
-        startMarking(EzCadAppRef, marking_time)
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying setXtoZero in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
+        try:
+            selectFirstObjectInList(EzCadAppRef)
+
+            time.sleep(0.5)
+            print("\t- Hatching the object")
+            hatchObject(app, EzCadAppRef, current_loop_count)
+
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in hatchObject')
+
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while Hatching Object!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
+
+                try:
+                    print("\nRetrying to Hatch Object: ")
+
+                    selectFirstObjectInList(EzCadAppRef)
+
+                    time.sleep(0.5)
+                    print("\t- Hatching the object")
+                    hatchObject(app, EzCadAppRef, current_loop_count)
+
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
+
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying hatchObject in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
+        try:
+            selectLastObjectInList(EzCadAppRef)
+
+            time.sleep(0.5)
+            print("\t- Enabling Hatching")
+            clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
+
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in clickEnableInHatching(1)')
+
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while Enabling Hatching!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
+
+                try:
+                    print("\nRetrying to Click Enable in Hatching: ")
+
+                    selectLastObjectInList(EzCadAppRef)
+
+                    time.sleep(0.5)
+                    print("\t- Enabling Hatching")
+                    clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
+
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
+
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying clickEnableInHatching(1) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
+        try:
+            selectLastObjectInList(EzCadAppRef)
+
+            time.sleep(0.5)
+            print("\t- Setting 1st Mark's Properties")
+            selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
+
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in selectMarkingProperty(0)')
+
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while setting 1st Mark's Property!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
+
+                try:
+                    print("\nRetrying to set 1st Mark's Property: ")
+
+                    selectLastObjectInList(EzCadAppRef)
+
+                    time.sleep(0.5)
+                    print("\t- Setting 1st Mark's Properties")
+                    selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
+
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
+
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying selectMarkingProperty(0) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
+        try:
+            selectLastObjectInList(EzCadAppRef)
+
+            time.sleep(0.5)
+            print("\t- Starting Marking")
+            startMarking(EzCadAppRef, marking_time)
+
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in startMarking')
+
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while starting Marking process!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
+
+                try:
+                    print("\nRetrying to Start Marking: ")
+
+                    selectLastObjectInList(EzCadAppRef)
+
+                    time.sleep(0.5)
+                    print("\t- Starting Marking")
+                    startMarking(EzCadAppRef, marking_time)
+
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
+
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying startMarking in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
+        try:
+            selectLastObjectInList(EzCadAppRef)
+
+            time.sleep(0.5)
+            print("\t- Disabling Hatching")
+            clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
+
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in clickEnableInHatching(0)')
+
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while Disabling Hatching!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
+
+                try:
+                    print("\nRetrying to Disable Hatching: ")
+
+                    selectLastObjectInList(EzCadAppRef)
+
+                    time.sleep(0.5)
+                    print("\t- Disabling Hatching")
+                    clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
+
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
+
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying clickEnableInHatching(0) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
+        try:
+            selectLastObjectInList(EzCadAppRef)
+
+            time.sleep(0.5)
+            print("\t- Setting 2nd Mark's Properties")
+            selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
+
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in selectMarkingProperty(1)')
+
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while setting 2nd Mark's Property!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
+
+                try:
+                    print("\nRetrying to set 2nd Mark's Property: ")
+
+                    selectLastObjectInList(EzCadAppRef)
+
+                    time.sleep(0.5)
+                    print("\t- Setting 2nd Mark's Properties")
+                    selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
+
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
+
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying selectMarkingProperty(1) in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
+        try:
+            selectLastObjectInList(EzCadAppRef)
+
+            time.sleep(0.5)
+            print("\t- Starting Marking")
+            startMarking(EzCadAppRef, marking_time)
+
+        except Exception as e:
+            logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in startMarking')
+
+            # Retry the function call up to 3 times
+            while retries < 3:
+                print("\nSome unexpected error occured while starting Marking process!!!")
+                retries += 1
+                print(f"\nRetry number: {retries}")
+                time.sleep(1)
+
+                try:
+                    print("\nRetrying to Start Marking: ")
+
+                    selectLastObjectInList(EzCadAppRef)
+
+                    time.sleep(0.5)
+                    print("\t- Starting Marking")
+                    startMarking(EzCadAppRef, marking_time)
+
+                    print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+                    retries = 0
+                    break
+
+                except:
+                    logging.exception(f'\n\n\nError number({retries}), while retrying startMarking in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+                    print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
+
+
 
         # Set the focus to the EzCad software window
         time.sleep(0.1)
@@ -264,12 +535,84 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
         time.sleep(0.1)
 
         print("\t- Deleting current layer item")
+        selectLastObjectInList(EzCadAppRef)
         send_keys('{DELETE}')
+
+        # except Exception as e:
+        #     logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+
+        #     # Retry the function call up to 3 times
+        #     while retries < 3:
+        #         print("\nSome unexpected error occured while running automation!!!")
+        #         retries += 1
+        #         print(f"\nRetry number: {retries}")
+        #         time.sleep(1)
+        #         try:
+        #             # Change to current_loop_count + 1   when myError_1 is resolved
+        #             print("\nRetrying Layer: ", current_loop_count + 2)
+
+        #             selectFirstObjectInList(EzCadAppRef)
+
+        #             time.sleep(0.5)
+        #             print("\t- Setting X coord to ZERO")
+        #             setXtoZero(EzCadAppRef)
+
+        #             time.sleep(0.5)
+        #             print("\t- Hatching the object")
+        #             hatchObject(app, EzCadAppRef, current_loop_count)
+
+        #             time.sleep(0.5)
+        #             print("\t- Enabling Hatching")
+        #             clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
+
+        #             time.sleep(0.5)
+        #             print("\t- Setting 1st Mark's Properties")
+        #             selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
+
+        #             time.sleep(0.5)
+        #             print("\t- Starting Marking")
+        #             startMarking(EzCadAppRef, marking_time)
+
+        #             time.sleep(0.5)
+        #             print("\t- Disabling Hatching")
+        #             clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
+
+        #             time.sleep(0.5)
+        #             print("\t- Setting 2nd Mark's Properties")
+        #             selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
+
+        #             time.sleep(0.5)
+        #             print("\t- Starting Marking")
+        #             startMarking(EzCadAppRef, marking_time)
+
+        #             # Set the focus to the EzCad software window
+        #             time.sleep(0.1)
+        #             EzCadAppRef.set_focus()
+        #             time.sleep(0.1)
+
+        #             print("\t- Deleting current layer item")
+        #             selectLastObjectInList(EzCadAppRef)
+        #             send_keys('{DELETE}')
+
+        #             print(f"\nRetry SUCCESSFULL on retry number {retries}!!!")
+        #             retries = 0
+        #             break
+        #         except:
+        #             logging.exception(f'\n\n\nRetrying Error number: {retries} in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()}')
+        #             print(f"\nRetry number {retries} UNSUCCESSFULL!!!")
 
         if(should_pause != True):   # To check if pause has been pressed while printing, if 'yes', then don't sleep for new layer printing
             # Constant time that this function will pause between printing of each layer
             print(f"\t- Waiting for 'Next Layer Delay: {const_printing_interval} sec' time")
-            time.sleep(const_printing_interval)
+
+            # sleeping for 1 second as i want user to be able to pause execuition while nextLayerDelay is in progress
+            for i in range(0, const_printing_interval):
+                # Checking if pause button has been pressed while the program was waiting for Next Layer Delay Time, else sleep for 1 seconds for const_printing_interval time i.e., 1 * const_printing_interval = const_printing_interval time sleep
+                if(should_pause == True):
+                    is_paused = True
+                    break
+                time.sleep(1)
+            # time.sleep(const_printing_interval)
     
         current_loop_count += 1
 
