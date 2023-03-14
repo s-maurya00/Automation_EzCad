@@ -899,8 +899,14 @@ def begin(resizingWaitTime, const_printing_interval, marking_time):
 
 
     # Pause code's execuition untill the application gets loaded
-    EzCadAppRef.wait('ready')
+    try:
+        time.sleep(0.5)
+        EzCadAppRef.wait('ready')
 
+    except Exception as e:
+        logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in begin function\'s EzCadAppRef.wait(\'ready\')')
+        print("\nInitializing program, please wait while we set everything up for you.")
+        time.sleep(5)
 
     # Double click titleBar of the window and drag it to right-corner to snap to the same
     time.sleep(2)
