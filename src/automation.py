@@ -103,6 +103,23 @@ def selectFirstObjectInList(EzCadAppRef):
 
 
 
+def showRedBoundary(app, EzCadAppRef):
+    # Shows a red bounday around an item of the list which is used for affixing the base under the object
+
+    # Set the focus to the EzCad software window
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
+    EzCadAppRef.set_focus()
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
+
+    EzCadAppRef[u'Red(F1)'].click()
+
+    while True:
+        if(app[u'Mark'].exists()):   # If the Red boundary window is open, wait 1 second and recheck if it's open, if yes then wait again else return from the function
+            time.sleep(1)
+        else:
+            break
+
+
 def selectLastObjectInList(EzCadAppRef):
     # Selects the Last item from the object list of available objects as it is the currently hatched item
 
@@ -306,6 +323,9 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
         deleteFirstNObjectsInList(EzCadAppRef, begin_at_layer_no)
         current_loop_count += begin_at_layer_no - 1     # If begin_at_layer_no = 3 then current_loop_count must be = 2
         print(f"\nSuccessfully deleted first {begin_at_layer_no - 1} items!!")
+
+        # Shows a red bounday around the 1st item of the list which is used for affixing the base under the object
+        showRedBoundary(app, EzCadAppRef)
     
 
     # For myError_1; Added code for deleting just layer item cause it's nesting NG code is not generated automatically by "new_nest.cpp" file
@@ -315,6 +335,9 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
         send_keys('{DELETE}')
         current_loop_count += 1
         print("\nSuccessfully deleted layer 1 item!!")
+
+        # Shows a red bounday around the 1st item of the list which is used for affixing the base under the object
+        showRedBoundary(app, EzCadAppRef)
     # Delete above section when NC code for layer 1 is genereated automatically
 
     # Setting the "is_programs_first_layer" to "0" so that rest of the program knows that current layer is not the 1st layer encountred by the program
