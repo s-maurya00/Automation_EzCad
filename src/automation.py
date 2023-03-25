@@ -13,6 +13,14 @@ from tkinter import filedialog, messagebox
 logging.basicConfig(filename='errorlog.txt', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+# PROGRAM CONSTANTS
+WINDOW_FOCUS_WAIT_TIME = 0.1    # Time to wait for focusing of a window before clicking any button of EzCad window
+ANY_CLICK_WAIT_TIME = 0.1       # Time to wait for any random click's task to be execuited by EzCad 
+FUNCTION_INTERVAL_WAIT_TIME = 0.1   # Time to wait after performing a function in print3dItem()
+RETRY_WAIT_TIME = 0.2   # Time to wait while retrying execuition of a function in print3dItem()
+
+
+
 """
 INPUTS: 
     Path of SVG File,
@@ -62,9 +70,9 @@ def selectFirstObjectInList(EzCadAppRef):
     # Selects the first item to be printed from the available objects in the object list
 
     # Set the focus to the EzCad software window
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
     EzCadAppRef.set_focus()
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
     # if(loopCount == 0):     # This reduces the PC Load by only having to click outside the Object List box ONCE
     # Select the "Edit Node" Tool
@@ -85,9 +93,9 @@ def selectLastObjectInList(EzCadAppRef):
     # Selects the Last item from the object list of available objects as it is the currently hatched item
 
     # Set the focus to the EzCad software window
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
     EzCadAppRef.set_focus()
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
     # Select the "Edit Node" Tool
     EzCadAppRef[u'Toolbar3'].button(1).click()
@@ -107,9 +115,9 @@ def setXtoZero(EzCadAppRef):
     # Sets the X axis position of current object to "0" and applies it
 
     # Set the focus to the EzCad software window
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
     EzCadAppRef.set_focus()
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
     EzCadAppRef[u'Edit2'].type_keys('{END}+{HOME}0')
     EzCadAppRef[u'&Apply'].click_input()
@@ -120,14 +128,14 @@ def hatchObject(app, EzCadAppRef, loopCount):
     # Hatches the current object and press 'OK'
 
     # Set the focus to the EzCad software window
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
     EzCadAppRef.set_focus()
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
     # Open Hatching Menu window
     EzCadAppRef.menu_item(u'&Edit->Hatch\\tCtrl+H').click()
 
-    time.sleep(0.5)
+    time.sleep(ANY_CLICK_WAIT_TIME)
     if(loopCount == 0): # Only wait for user input in setting the hatching property for the 1st loop item.
         while True:
             if app.Hatch.exists():  # If the Hatching property window is open, wait 1 second and recheck if it's open, if yes then wait again else return from the function
@@ -143,9 +151,9 @@ def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
     # Enable OR Disable the hatching checkbox in the "Hatching" Table and click "Apply"
 
     # Set the focus to the EzCad software window
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
     EzCadAppRef.set_focus()
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
     if(setCheckmarkTo == 0):   # '0' signifies that the checkbox has to be unchecked
         EzCadAppRef[u'Enable'].uncheck()
@@ -161,9 +169,9 @@ def selectMarkingProperty(EzCadAppRef, iter, loopCount):
     # Selects either 'black' or 'blue' marking property based on the 'iter' value
 
     # Set the focus to the EzCad software window
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
     EzCadAppRef.set_focus()
-    time.sleep(0.1)
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
     if(iter == 0):  # Black color parameters
         
@@ -218,6 +226,11 @@ def selectMarkingProperty(EzCadAppRef, iter, loopCount):
 def startMarking(EzCadAppRef, marking_time):
     # Start the Marking process
 
+    # Set the focus to the EzCad software window
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
+    EzCadAppRef.set_focus()
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
+
     EzCadAppRef[u'Mark(F2)'].click_input()
     time.sleep(marking_time)   # Sleep till the printing is completed
 
@@ -232,7 +245,36 @@ def startMarking(EzCadAppRef, marking_time):
 current_loop_count = 0
 retries = 0
 def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
-    # Performs all relevant steps for all the available objects
+    """
+        1. List of all called function in sequence is: 
+
+            selectFirstObjectInList(EzCadAppRef)
+            setXtoZero(EzCadAppRef)
+
+            selectFirstObjectInList(EzCadAppRef)
+            hatchObject(app, EzCadAppRef, current_loop_count)
+
+            selectLastObjectInList(EzCadAppRef)
+            clickEnableInHatching(EzCadAppRef, 1)
+
+            selectLastObjectInList(EzCadAppRef)
+            selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
+
+            selectLastObjectInList(EzCadAppRef)
+            startMarking(EzCadAppRef, marking_time)
+
+            selectLastObjectInList(EzCadAppRef)
+            clickEnableInHatching(EzCadAppRef, 0)
+
+            selectLastObjectInList(EzCadAppRef)
+            selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
+
+            selectLastObjectInList(EzCadAppRef)
+            startMarking(EzCadAppRef, marking_time)
+
+            selectLastObjectInList(EzCadAppRef)
+            send_keys('{DELETE}')
+    """
 
     global should_pause, is_paused, current_loop_count, retries
 
@@ -245,13 +287,16 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
     while((current_loop_count < numberOfObjectsInSVG) and (should_pause != True)):
 
+
+
+        # Setting X to Zero
         try:
             # Change to current_loop_count + 1   when myError_1 is resolved
             print("\nWorking on Layer: ", current_loop_count + 2)
 
             selectFirstObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Setting X coord to ZERO")
             setXtoZero(EzCadAppRef)
 
@@ -262,14 +307,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while setting X to Zero!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying setting X to Zero: ")
 
                     selectFirstObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Setting X coord to ZERO")
                     setXtoZero(EzCadAppRef)
 
@@ -290,10 +335,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                 break
 
 
+
+        # Hatching the object
         try:
             selectFirstObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Hatching the object")
             hatchObject(app, EzCadAppRef, current_loop_count)
 
@@ -304,14 +351,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while Hatching Object!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying to Hatch Object: ")
 
                     selectFirstObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Hatching the object")
                     hatchObject(app, EzCadAppRef, current_loop_count)
 
@@ -332,10 +379,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                 break
 
 
+
+        # Clicking the Enable Checkbox for Hatching
         try:
             selectLastObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Enabling Hatching")
             clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
 
@@ -346,14 +395,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while Enabling Hatching!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying to Click Enable in Hatching: ")
 
                     selectLastObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Enabling Hatching")
                     clickEnableInHatching(EzCadAppRef, 1)   # Firstly, we enable the hatching for black one
 
@@ -374,10 +423,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                 break
 
 
-        try:
-            selectLastObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+        # Setting 1st Mark's properties
+        try:
+            selectLastObjectInList(EzCadAppRef) 
+
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Setting 1st Mark's Properties")
             selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
 
@@ -388,14 +439,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while setting 1st Mark's Property!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying to set 1st Mark's Property: ")
 
                     selectLastObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Setting 1st Mark's Properties")
                     selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
 
@@ -416,10 +467,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                 break
 
 
+
+        # Starting the Lasor Marking
         try:
             selectLastObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Starting Marking")
             startMarking(EzCadAppRef, marking_time)
 
@@ -430,14 +483,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while starting Marking process!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying to Start Marking: ")
 
                     selectLastObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Starting Marking")
                     startMarking(EzCadAppRef, marking_time)
 
@@ -458,10 +511,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                 break
 
 
+
+        # Clicking the Disable Checkbox for Hatching
         try:
             selectLastObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Disabling Hatching")
             clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
 
@@ -472,14 +527,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while Disabling Hatching!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying to Disable Hatching: ")
 
                     selectLastObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Disabling Hatching")
                     clickEnableInHatching(EzCadAppRef, 0)   # Here we disable the hatching for the blue one
 
@@ -500,10 +555,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                 break
 
 
+
+        # Selecting 2nd mark's property
         try:
             selectLastObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Setting 2nd Mark's Properties")
             selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
 
@@ -514,14 +571,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while setting 2nd Mark's Property!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying to set 2nd Mark's Property: ")
 
                     selectLastObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Setting 2nd Mark's Properties")
                     selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
 
@@ -542,10 +599,12 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
                 break
 
 
+
+        # Starting the Lasor Marking
         try:
             selectLastObjectInList(EzCadAppRef)
 
-            time.sleep(0.5)
+            time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Starting Marking")
             startMarking(EzCadAppRef, marking_time)
 
@@ -556,14 +615,14 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             while retries < 3:
                 print("\nSome unexpected error occured while starting Marking process!!!")
                 print(f"\nRetry number: {retries + 1}")
-                time.sleep(1)
+                time.sleep(RETRY_WAIT_TIME)
 
                 try:
                     print("\nRetrying to Start Marking: ")
 
                     selectLastObjectInList(EzCadAppRef)
 
-                    time.sleep(0.5)
+                    time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Starting Marking")
                     startMarking(EzCadAppRef, marking_time)
 
@@ -586,9 +645,9 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
 
         # Set the focus to the EzCad software window
-        time.sleep(0.1)
+        time.sleep(WINDOW_FOCUS_WAIT_TIME)
         EzCadAppRef.set_focus()
-        time.sleep(0.1)
+        time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
         print("\t- Deleting current layer item")
         selectLastObjectInList(EzCadAppRef)
@@ -1016,7 +1075,7 @@ class GUI:
 
 
         # Take input for time to wait for marking to complete
-        self.marking_time_label = tkinter.Label(self.select_file_section, text="Contour Marking time")
+        self.marking_time_label = tkinter.Label(self.select_file_section, text="Lasor movement time for hatching")
         self.marking_time_label.grid(row=3, column=0, padx=10, pady=10)
 
         self.marking_time_entry = tkinter.Entry(self.select_file_section, textvariable=self.marking_time, width=15, relief="groove")
