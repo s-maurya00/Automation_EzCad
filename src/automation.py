@@ -285,6 +285,9 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
             deleteFirstNObjectsInList(EzCadAppRef, begin_at_layer_no)
 
             selectFirstObjectInList(EzCadAppRef)
+            showRedBoundary(app, EzCadAppRef)
+            
+            selectFirstObjectInList(EzCadAppRef)
             setXtoZero(EzCadAppRef)
 
             selectFirstObjectInList(EzCadAppRef)
@@ -325,6 +328,8 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
         print(f"\nSuccessfully deleted first {begin_at_layer_no - 1} items!!")
 
         # Shows a red bounday around the 1st item of the list which is used for affixing the base under the object
+        selectFirstObjectInList(EzCadAppRef)
+        setXtoZero(EzCadAppRef)
         showRedBoundary(app, EzCadAppRef)
     
 
@@ -337,7 +342,10 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
         print("\nSuccessfully deleted layer 1 item!!")
 
         # Shows a red bounday around the 1st item of the list which is used for affixing the base under the object
+        selectFirstObjectInList(EzCadAppRef)
+        setXtoZero(EzCadAppRef)
         showRedBoundary(app, EzCadAppRef)
+
     # Delete above section when NC code for layer 1 is genereated automatically
 
     # Setting the "is_programs_first_layer" to "0" so that rest of the program knows that current layer is not the 1st layer encountred by the program
