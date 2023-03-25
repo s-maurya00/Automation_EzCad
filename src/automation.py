@@ -237,7 +237,7 @@ def selectMarkingProperty(EzCadAppRef, iter, is_programs_first_layer):
 
 
 
-def startMarking(EzCadAppRef, marking_time):
+def startMarking(app, EzCadAppRef, marking_time):
     # Start the Marking process
 
     # Set the focus to the EzCad software window
@@ -246,13 +246,13 @@ def startMarking(EzCadAppRef, marking_time):
     time.sleep(WINDOW_FOCUS_WAIT_TIME)
 
     EzCadAppRef[u'Mark(F2)'].click_input()
-    time.sleep(marking_time)   # Sleep till the printing is completed
+    # time.sleep(marking_time)   # Sleep till the printing is completed
 
-    # while True:
-    #     if(EzCadAppRef[u'Mark'].exists()):   # If the Marking property window is open, wait 1 second and recheck if it's open, if yes then wait again else return from the function
-    #         time.sleep(1)
-    #     else:
-    #         break
+    while True:
+        if(app[u'Mark'].exists()):   # If the Marking property window is open, wait 1 second and recheck if it's open, if yes then wait again else return from the function
+            time.sleep(1)
+        else:
+            break
 
 
 
@@ -280,7 +280,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
             selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
 
             selectLastObjectInList(EzCadAppRef)
-            startMarking(EzCadAppRef, marking_time)
+            startMarking(app, EzCadAppRef, marking_time)
 
             selectLastObjectInList(EzCadAppRef)
             clickEnableInHatching(EzCadAppRef, 0)
@@ -289,7 +289,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
             selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
 
             selectLastObjectInList(EzCadAppRef)
-            startMarking(EzCadAppRef, marking_time)
+            startMarking(app, EzCadAppRef, marking_time)
 
             selectLastObjectInList(EzCadAppRef)
             send_keys('{DELETE}')
@@ -517,7 +517,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
 
             time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Starting Marking")
-            startMarking(EzCadAppRef, marking_time)
+            startMarking(app, EzCadAppRef, marking_time)
 
         except Exception as e:
             logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in startMarking')
@@ -535,7 +535,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
 
                     time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Starting Marking")
-                    startMarking(EzCadAppRef, marking_time)
+                    startMarking(app, EzCadAppRef, marking_time)
 
                     print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
@@ -649,7 +649,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
 
             time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Starting Marking")
-            startMarking(EzCadAppRef, marking_time)
+            startMarking(app, EzCadAppRef, marking_time)
 
         except Exception as e:
             logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in startMarking')
@@ -667,7 +667,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const
 
                     time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Starting Marking")
-                    startMarking(EzCadAppRef, marking_time)
+                    startMarking(app, EzCadAppRef, marking_time)
 
                     print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
@@ -1119,7 +1119,7 @@ class GUI:
 
 
         # Take input for time to wait for marking to complete
-        self.marking_time_label = tkinter.Label(self.select_file_section, text="Lasor movement time for hatching")
+        self.marking_time_label = tkinter.Label(self.select_file_section, text="Lasor movement time for hatching (not in use)")
         self.marking_time_label.grid(row=3, column=0, padx=10, pady=10)
 
         self.marking_time_entry = tkinter.Entry(self.select_file_section, textvariable=self.marking_time, width=15, relief="groove")
@@ -1145,7 +1145,7 @@ class GUI:
 
 
         # Start at particular layer number
-        self.begin_at_layer_no_label = tkinter.Button(self.calculate_layers_section, text="Begin at Layer number: ", command=self.calc_no_of_layers, width=30, relief="groove")
+        self.begin_at_layer_no_label = tkinter.Label(self.calculate_layers_section, text="Begin at Layer number: ")
         self.begin_at_layer_no_label.grid(row=1, column=0, padx=10, pady=10)
 
         self.begin_at_layer_no_entry = tkinter.Entry(self.calculate_layers_section, textvariable=self.begin_at_layer_no, width=15, relief="groove")
