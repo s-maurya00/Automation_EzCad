@@ -16,9 +16,8 @@ logging.basicConfig(filename='errorlog.txt', level=logging.ERROR, format='%(asct
 # PROGRAM CONSTANTS
 WINDOW_FOCUS_WAIT_TIME = 0.1    # Time to wait for focusing of a window before clicking any button of EzCad window
 ANY_CLICK_WAIT_TIME = 0.1       # Time to wait for any random click's task to be execuited by EzCad 
-FUNCTION_INTERVAL_WAIT_TIME = 0.1   # Time to wait after performing a function in print3dItem()
+FUNCTION_INTERVAL_WAIT_TIME = 0.2   # Time to wait after performing a function in print3dItem()
 RETRY_WAIT_TIME = 0.2   # Time to wait while retrying execuition of a function in print3dItem()
-
 
 
 """
@@ -63,6 +62,21 @@ FUTURE WORK:
 """
 
 
+
+
+
+def deleteFirstNObjectsInList(EzCadAppRef, begin_at_layer_no):
+    # Deletes the starting 'n' objects so that program starts at a given layer count
+
+    # Set the focus to the EzCad software window
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
+    EzCadAppRef.set_focus()
+    time.sleep(WINDOW_FOCUS_WAIT_TIME)
+
+    for i in range(0, begin_at_layer_no - 2):
+        send_keys('+{DOWN}')
+
+    send_keys('{DELETE}')
 
 
 
@@ -124,7 +138,7 @@ def setXtoZero(EzCadAppRef):
 
 
 
-def hatchObject(app, EzCadAppRef, loopCount):
+def hatchObject(app, EzCadAppRef, is_programs_first_layer):
     # Hatches the current object and press 'OK'
 
     # Set the focus to the EzCad software window
@@ -136,7 +150,7 @@ def hatchObject(app, EzCadAppRef, loopCount):
     EzCadAppRef.menu_item(u'&Edit->Hatch\\tCtrl+H').click()
 
     time.sleep(ANY_CLICK_WAIT_TIME)
-    if(loopCount == 0): # Only wait for user input in setting the hatching property for the 1st loop item.
+    if(is_programs_first_layer == 1): # Only wait for user input in setting the hatching property for the 1st loop item.
         while True:
             if app.Hatch.exists():  # If the Hatching property window is open, wait 1 second and recheck if it's open, if yes then wait again else return from the function
                 time.sleep(1)
@@ -165,7 +179,7 @@ def clickEnableInHatching(EzCadAppRef, setCheckmarkTo):
 
 
 
-def selectMarkingProperty(EzCadAppRef, iter, loopCount):
+def selectMarkingProperty(EzCadAppRef, iter, is_programs_first_layer):
     # Selects either 'black' or 'blue' marking property based on the 'iter' value
 
     # Set the focus to the EzCad software window
@@ -178,7 +192,7 @@ def selectMarkingProperty(EzCadAppRef, iter, loopCount):
         # Click Black Color button
         EzCadAppRef[u'Button12'].click_input()
 
-        if(loopCount == 0):
+        if(is_programs_first_layer == 1):
 
             # Uncheck default param
             if(EzCadAppRef[u'Use default param'].get_check_state()):
@@ -202,7 +216,7 @@ def selectMarkingProperty(EzCadAppRef, iter, loopCount):
         # Click Blue color Button
         EzCadAppRef[u'Button13'].click_input()
 
-        if(loopCount == 0):
+        if(is_programs_first_layer == 1):
 
             # Uncheck default param
             if(EzCadAppRef[u'Use default param'].get_check_state()):
@@ -244,9 +258,14 @@ def startMarking(EzCadAppRef, marking_time):
 
 current_loop_count = 0
 retries = 0
-def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
+is_programs_first_layer = 0     # This variable is used to know whether current layer is the 1st layer encountered by the program upon begining
+def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time):
+
     """
         1. List of all called function in sequence is: 
+
+            selectFirstObjectInList(EzCadAppRef)
+            deleteFirstNObjectsInList(EzCadAppRef, begin_at_layer_no)
 
             selectFirstObjectInList(EzCadAppRef)
             setXtoZero(EzCadAppRef)
@@ -276,23 +295,47 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
             send_keys('{DELETE}')
     """
 
-    global should_pause, is_paused, current_loop_count, retries
+    global should_pause, is_paused, current_loop_count, retries, is_programs_first_layer
 
-    # For myError_1; Added code for deleting just layer item cause it's nesting NG code is not generated automatically
-    if(current_loop_count == 0):
+
+
+    # Deletes the first "N" Objects and begins printing at layer "begin_at_layer_no"
+    if(current_loop_count == 0 and begin_at_layer_no > 0):
+        is_programs_first_layer = 1
+        selectFirstObjectInList(EzCadAppRef)
+        deleteFirstNObjectsInList(EzCadAppRef, begin_at_layer_no)
+        current_loop_count += begin_at_layer_no - 1     # If begin_at_layer_no = 3 then current_loop_count must be = 2
+        print(f"\nSuccessfully deleted first {begin_at_layer_no - 1} items!!")
+    
+
+    # For myError_1; Added code for deleting just layer item cause it's nesting NG code is not generated automatically by "new_nest.cpp" file
+    elif(current_loop_count == 0 and begin_at_layer_no <= 0):
+        is_programs_first_layer = 1
         selectFirstObjectInList(EzCadAppRef)
         send_keys('{DELETE}')
+        current_loop_count += 1
         print("\nSuccessfully deleted layer 1 item!!")
     # Delete above section when NC code for layer 1 is genereated automatically
 
+    # Setting the "is_programs_first_layer" to "0" so that rest of the program knows that current layer is not the 1st layer encountred by the program
+    else:
+        is_programs_first_layer = 0
+
+
     while((current_loop_count < numberOfObjectsInSVG) and (should_pause != True)):
 
+        # Setting the "is_programs_first_layer" to "0" so that rest of the program knows that current layer is not the 1st layer encountred by the program
+        # For myError_1; change the if condition to
+        # "if(((begin_at_layer_no <= 0) and (current_loop_count > 0)) or ((begin_at_layer_no > 0) and (current_loop_count == begin_at_layer_no))):"
+        # when the myError_1 is resolved
+        if(((begin_at_layer_no <= 0) and (current_loop_count > 1)) or ((begin_at_layer_no > 0) and (current_loop_count == begin_at_layer_no))):
+            is_programs_first_layer = 0
 
 
         # Setting X to Zero
         try:
-            # Change to current_loop_count + 1   when myError_1 is resolved
-            print("\nWorking on Layer: ", current_loop_count + 2)
+            # Change to current_loop_count + 1 when myError_1 is resolved
+            print("\nWorking on Layer: ", current_loop_count + 1)
 
             selectFirstObjectInList(EzCadAppRef)
 
@@ -342,7 +385,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
             time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Hatching the object")
-            hatchObject(app, EzCadAppRef, current_loop_count)
+            hatchObject(app, EzCadAppRef, is_programs_first_layer)
 
         except Exception as e:
             logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in hatchObject')
@@ -360,7 +403,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
                     time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Hatching the object")
-                    hatchObject(app, EzCadAppRef, current_loop_count)
+                    hatchObject(app, EzCadAppRef, is_programs_first_layer)
 
                     print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
@@ -430,7 +473,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
             time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Setting 1st Mark's Properties")
-            selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
+            selectMarkingProperty(EzCadAppRef, 0, is_programs_first_layer)
 
         except Exception as e:
             logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in selectMarkingProperty(0)')
@@ -448,7 +491,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
                     time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Setting 1st Mark's Properties")
-                    selectMarkingProperty(EzCadAppRef, 0, current_loop_count)
+                    selectMarkingProperty(EzCadAppRef, 0, is_programs_first_layer)
 
                     print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
@@ -562,7 +605,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
             time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
             print("\t- Setting 2nd Mark's Properties")
-            selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
+            selectMarkingProperty(EzCadAppRef, 1, is_programs_first_layer)
 
         except Exception as e:
             logging.exception(f'\n\n\nError in file {os.path.basename(__file__)} on {socket.gethostname()} at {datetime.datetime.now()} in selectMarkingProperty(1)')
@@ -580,7 +623,7 @@ def print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval,
 
                     time.sleep(FUNCTION_INTERVAL_WAIT_TIME)
                     print("\t- Setting 2nd Mark's Properties")
-                    selectMarkingProperty(EzCadAppRef, 1, current_loop_count)
+                    selectMarkingProperty(EzCadAppRef, 1, is_programs_first_layer)
 
                     print(f"\nRetry SUCCESSFULL on retry number {retries + 1}!!!")
                     retries = 0
@@ -821,7 +864,7 @@ def waitForResizing(resize_wait_time):
 
 
 
-def play_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
+def play_process(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time):
     global should_pause, is_paused, thread
 
     # should_pause is used to tell the print3dItem function that the pause button has been pressed and the function has to be stopped after execution of current cycle which may take some "x" seconds
@@ -831,7 +874,7 @@ def play_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval
 
     print("\nStarting the Printing Process")
 
-    thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
+    thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time))
     thread.start()
 
 
@@ -854,7 +897,7 @@ def pause_process():
 
 
 
-def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time, layer_info, gui_controls_root):
+def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time, layer_info, gui_controls_root):
     global should_pause, thread, is_paused
     should_pause = False
 
@@ -868,7 +911,7 @@ def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interv
     if(is_paused):
         is_paused = False
         
-        thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
+        thread = threading.Thread(target=print3dItem, args=(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time))
         thread.start()
 
         update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root)
@@ -879,15 +922,14 @@ def resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interv
 def update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root):
     global current_loop_count, should_pause
 
-    # Change to current_loop_count + 1 when myError_1 is resolved
-    layer_info.config(text=f"Printing layer: {current_loop_count + 2} of {numberOfObjectsInSVG}")
+    layer_info.config(text=f"Printing layer: {current_loop_count + 1} of {numberOfObjectsInSVG}")
 
     if(should_pause == False):
         gui_controls_root.after(1000, lambda: update_current_layer_count(layer_info, numberOfObjectsInSVG, gui_controls_root))
 
 
 
-def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
+def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time):
     # Create the GUI window of controls on screen
     gui_controls_root = tkinter.Tk()
     
@@ -906,13 +948,13 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     gui_control_frame = tkinter.LabelFrame(gui_controls_root, text="Controls")
 
 
-    play_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
+    play_process(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time)
 
 
     pause_button = tkinter.Button(gui_control_frame, text="Pause", command=pause_process, width=16, relief="groove")
     pause_button.grid(row=1, column=1, padx=10, pady=10)
 
-    resume_button = tkinter.Button(gui_control_frame, text="Resume", command=lambda: resume_process(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time, layer_info, gui_controls_root), width=16, relief="groove")
+    resume_button = tkinter.Button(gui_control_frame, text="Resume", command=lambda: resume_process(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time, layer_info, gui_controls_root), width=16, relief="groove")
     resume_button.grid(row=1, column=2, padx=10, pady=10)
 
     gui_control_frame.grid(row=0, padx=10, pady=10)
@@ -930,17 +972,17 @@ def createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_inte
     gui_controls_root.mainloop()
 
 
-    def print3d_thread(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time):
-        print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
+    def print3d_thread(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time):
+        print3dItem(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time)
 
-    thread = threading.Thread(target=print3d_thread, args=(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time))
+    thread = threading.Thread(target=print3d_thread, args=(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time))
     thread.start()
 
 
 
 
 
-def begin(resizingWaitTime, const_printing_interval, marking_time):
+def begin(resizingWaitTime, begin_at_layer_no, const_printing_interval, marking_time):
 
     app = Application(backend='win32').start(cmd_line=u'"C:\\Users\\maury\\Desktop\\For OptiLOM\\EZCAD2-Software\\EZCAD2 For AiO (20220915 Release)\\EZCAD2 For AiO.exe" ')
     EzCadAppRef = app[u'EzCad2.14.11 - No title']
@@ -1011,7 +1053,7 @@ def begin(resizingWaitTime, const_printing_interval, marking_time):
     numberOfObjectsInSVG = gui.no_of_layers.get()
 
 
-    createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, const_printing_interval, marking_time)
+    createControlGUI(app, EzCadAppRef, numberOfObjectsInSVG, begin_at_layer_no, const_printing_interval, marking_time)
 
 
 
@@ -1020,8 +1062,8 @@ def begin(resizingWaitTime, const_printing_interval, marking_time):
 class GUI:
     def __init__(self, root):
         self.root = root
-        self.root.minsize(502, 350)
-        self.root.maxsize(502, 350)
+        self.root.minsize(700, 500)
+        self.root.maxsize(700, 500)
         self.root.title("EzCad Automator")
 
         try:
@@ -1042,6 +1084,8 @@ class GUI:
         self.resizing_wait_time.set(45)
         self.marking_time = tkinter.IntVar()
         self.marking_time.set(10)
+        self.begin_at_layer_no = tkinter.IntVar()
+        self.begin_at_layer_no.set(0)
 
 
         self.select_file_section = tkinter.LabelFrame(self.root, text="Import File")
@@ -1086,9 +1130,11 @@ class GUI:
 
 
 
+
         self.calculate_layers_section = tkinter.LabelFrame(self.root, text="Click to calculate number of layers")
 
 
+        # Calculate the total number of layers in imported file
         self.start_button = tkinter.Button(self.calculate_layers_section, text="Calculate number of Layers", command=self.calc_no_of_layers, width=30, relief="groove")
         self.start_button.grid(row=0, column=0, padx=10, pady=10)
 
@@ -1098,8 +1144,15 @@ class GUI:
         calculated_no_of_layers_label.grid_remove()
 
 
+        # Start at particular layer number
+        self.begin_at_layer_no_label = tkinter.Button(self.calculate_layers_section, text="Begin at Layer number: ", command=self.calc_no_of_layers, width=30, relief="groove")
+        self.begin_at_layer_no_label.grid(row=1, column=0, padx=10, pady=10)
+
+        self.begin_at_layer_no_entry = tkinter.Entry(self.calculate_layers_section, textvariable=self.begin_at_layer_no, width=15, relief="groove")
+        self.begin_at_layer_no_entry.grid(row=1, column=1, padx=10, pady=10)
+
         self.start_button = tkinter.Button(self.calculate_layers_section, text="Start", command=self.start_process, width=15, relief="groove")
-        self.start_button.grid(row=1, column=0, pady=10, columnspan=2)
+        self.start_button.grid(row=2, column=0, pady=10, columnspan=2)
 
         self.calculate_layers_section.grid(padx=10, pady=10)
         
@@ -1137,9 +1190,9 @@ class GUI:
 
         if(self.file_location.get()):   # If file location is selected, only then should the program start
             gui_root.destroy()
-            if(self.no_of_layers.get() == -1):
+            if(self.no_of_layers.get() <= 0):
                 self.calc_no_of_layers()
-            begin(self.resizing_wait_time.get(), self.const_printing_interval.get(), self.marking_time.get())
+            begin(self.resizing_wait_time.get(), self.begin_at_layer_no.get(), self.const_printing_interval.get(), self.marking_time.get())
 
 
 gui_root = tkinter.Tk()
